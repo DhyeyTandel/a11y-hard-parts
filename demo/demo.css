@@ -1,0 +1,235 @@
+/* Demo site chrome. The components bring their own CSS; this is the page. */
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16.5px;
+  font-weight: 450;
+  line-height: 1.6;
+  color: var(--body-color);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 500;
+  padding: 10px 18px;
+  font-weight: 600;
+  color: var(--on-ink);
+  background: var(--ink-surface);
+  border-radius: var(--r-pill);
+}
+
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 40px; }
+.narrow { max-width: 760px; }
+
+.site-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 28px 0 20px;
+  border-bottom: 1px solid var(--faint);
+}
+
+.wordmark {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+.wordmark::before { content: "• "; color: var(--accent); }
+
+.site-nav { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+.site-nav a {
+  font-size: 15px;
+  color: var(--body-color);
+  text-decoration: none;
+  border-bottom: 1px solid var(--faint);
+  padding-bottom: 1px;
+}
+.site-nav a:hover { color: var(--accent); border-color: var(--accent); }
+.site-nav a[aria-current="page"] { color: var(--ink); border-color: var(--accent); }
+
+.theme-toggle {
+  padding: 5px 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 560;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--faint);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(40px, 6vw, 64px);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+h1 em { font-style: italic; color: var(--accent); }
+
+h2 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+h3 { margin: 32px 0 8px; font-size: 17px; font-weight: 600; color: var(--ink); }
+
+/* A sub-section heading. Level comes from the document outline, size from here —
+   so correcting the outline never forces a visual change. */
+h2.sub, h3.sub {
+  margin: 32px 0 8px;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.lede { font-size: 19px; color: var(--muted); max-width: 62ch; }
+
+section.block { padding: 64px 0; border-bottom: 1px solid var(--faint); }
+section.block:last-of-type { border-bottom: 0; }
+
+.demo-surface {
+  margin: 24px 0;
+  padding: 32px;
+  background: var(--card);
+  border: 1px solid var(--faint);
+  border-radius: var(--r-card);
+}
+
+.note {
+  margin: 20px 0;
+  padding: 16px 20px;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--r-card) var(--r-card) 0;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+.note strong { color: var(--ink); }
+
+kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--paper-lift);
+  border: 1px solid var(--faint);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+code { font-family: var(--font-mono); font-size: 0.9em; color: var(--accent-deep); }
+
+table.keys { width: 100%; border-collapse: collapse; margin: 16px 0; }
+table.keys caption {
+  text-align: left;
+  padding-bottom: 10px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+table.keys th, table.keys td {
+  padding: 9px 12px 9px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--faint);
+  font-size: 15px;
+}
+table.keys th { width: 190px; font-weight: 450; color: var(--ink); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font: inherit;
+  font-weight: 560;
+  color: var(--on-ink);
+  background: var(--ink-surface);
+  border: 1px solid var(--ink-surface);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: scale(0.97); }
+.btn--ghost { color: var(--ink); background: none; border-color: var(--faint); }
+.btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.card-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 32px; list-style: none; padding: 0; }
+.card {
+  display: block;
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--faint);
+  border-radius: var(--r-card);
+  text-decoration: none;
+  transition: transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-swift);
+}
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.card h2 { margin: 0 0 6px; font-family: var(--font-display); font-weight: 400; font-size: 26px; letter-spacing: -0.02em; }
+.card p { margin: 0; font-size: 15px; color: var(--muted); }
+.card .go { display: block; margin-top: 14px; color: var(--accent); font-weight: 600; font-size: 14px; }
+
+.site-footer {
+  margin-top: 80px;
+  padding: 48px 0;
+  color: var(--on-ink-muted);
+  background: var(--ink-surface);
+}
+.site-footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.site-footer strong { color: var(--on-ink); font-weight: 560; }
+.site-footer a { color: var(--on-ink); }
+
+@media (max-width: 640px) {
+  .wrap { padding: 0 20px; }
+  section.block { padding: 44px 0; }
+  .demo-surface { padding: 20px; }
+}

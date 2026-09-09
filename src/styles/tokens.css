@@ -1,0 +1,105 @@
+/*
+ * Design tokens.
+ *
+ * Every component below styles itself only through these variables, so the
+ * library can be re-themed without touching component CSS. The default values
+ * are the author's personal system (warm cream, one signal orange); swap this
+ * file to rebrand.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Surfaces */
+  --paper: #f4f0e9;
+  --paper-lift: #fcfaf6;
+  --card: #ffffff;
+  --ink-surface: #17140f;
+  --on-ink: #f4f0e9;
+  --on-ink-muted: #a89e90;
+
+  /* Text */
+  --ink: #17140f;
+  --ink-soft: #2b2620;
+  --body-color: #4b443a;
+  --muted: #7c7367;
+  --muted-soft: #a89e90;
+
+  /* Hairlines */
+  --faint: #e6dfd2;
+  --faint-soft: #efeae0;
+
+  /* Signal */
+  --accent: #ee5308;
+  --accent-deep: #c24303;
+  --accent-soft: #fbe6d9;
+  --blurple: #5b4df2;
+  --blurple-soft: #e7e4fd;
+  --success: #1e8a5a;
+  --success-soft: #dff0e7;
+  --warning: #a15c00;
+  --warning-soft: #fdeccd;
+  --error: #d0342c;
+  --error-soft: #fbe3e1;
+
+  /* Shape */
+  --r-card: 4px;
+  --r-input: 8px;
+  --r-media: 24px;
+  --r-pill: 999px;
+
+  /* Elevation */
+  --shadow-soft: 0 4px 24px rgba(23, 20, 15, 0.05);
+  --shadow-halo: 0 2px 4px rgba(23, 20, 15, 0.04), 0 24px 48px rgba(23, 20, 15, 0.08);
+  --shadow-lift: 0 8px 16px rgba(23, 20, 15, 0.06), 0 32px 64px rgba(23, 20, 15, 0.12);
+
+  /* Motion */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-swift: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 0.18s;
+  --dur: 0.32s;
+  --dur-slow: 0.6s;
+
+  /* Type */
+  --font-display: "Newsreader", ui-serif, Georgia, serif;
+  --font-sans: "Sofia Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /*
+   * Focus indicator.
+   *
+   * WCAG 2.2 Focus Appearance (2.4.11/2.4.13) wants an indicator that is at
+   * least a 2px-thick perimeter and has 3:1 contrast against BOTH the focused
+   * component and the adjacent background. Two rings — a dark outline plus a
+   * light offset gap — is the reliable way to satisfy that on both light and
+   * dark surfaces without knowing what the component sits on.
+   */
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --focus-ring-color: var(--accent);
+  --focus-ring-contrast: var(--paper-lift);
+}
+
+[data-theme="dark"] {
+  --paper: #17140f;
+  --paper-lift: #1e1912;
+  --card: #201b13;
+  --ink: #f4f0e9;
+  --ink-soft: #efeae0;
+  --body-color: #c9c0b2;
+  --muted: #a89e90;
+  --muted-soft: #6e6455;
+  --faint: #332d23;
+  --faint-soft: #2a2519;
+  --accent-soft: #3a2313;
+  --accent-deep: #ff8a4d;
+  --blurple-soft: #242046;
+  --success-soft: #12301f;
+  --warning-soft: #33230a;
+  --error-soft: #3a1614;
+  --ink-surface: #0f0c08;
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-halo: 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0 8px 16px rgba(0, 0, 0, 0.35), 0 32px 64px rgba(0, 0, 0, 0.55);
+  --focus-ring-contrast: var(--ink-surface);
+}

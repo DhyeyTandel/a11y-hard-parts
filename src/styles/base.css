@@ -1,0 +1,101 @@
+/*
+ * Cross-cutting accessibility primitives. Load once, before component CSS.
+ */
+
+/*
+ * Visually hidden, still announced.
+ *
+ * `display: none`, `visibility: hidden`, `hidden`, and zero width/height all
+ * remove the element from the accessibility tree — which is exactly wrong for
+ * a live region or a skip link. The clip-path + 1px approach is the one that
+ * keeps the node rendered (so AT observes it) while taking it out of sight.
+ *
+ * `white-space: nowrap` matters: without it, a long announcement wrapped into
+ * a 1px box can cause the page to grow a scrollbar.
+ */
+.a11y-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* The skip-link variant: hidden until focused. */
+.a11y-visually-hidden-focusable:not(:focus):not(:focus-within) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+
+/*
+ * Focus indicator.
+ *
+ * `:focus-visible`, not `:focus` — so a mouse click on a button does not leave
+ * a ring behind, but every keyboard and switch user always sees one. Never
+ * `outline: none` without a replacement; that is the single most common
+ * accessibility regression in a design system.
+ */
+:where(.a11y-scope) :focus-visible,
+.a11y-focus-ring:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--r-input);
+}
+
+/*
+ * Windows High Contrast / forced-colors.
+ *
+ * In forced-colors mode the OS replaces author colors with a user-chosen
+ * palette. Anything that carried meaning through color alone disappears, and
+ * `outline: transparent` tricks stop working. Re-state indicators with system
+ * color keywords, which are the only colors honoured here.
+ */
+@media (forced-colors: active) {
+  :where(.a11y-scope) :focus-visible,
+  .a11y-focus-ring:focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .a11y-dialog__panel,
+  .a11y-combobox__listbox,
+  .a11y-toast {
+    border: 1px solid CanvasText;
+  }
+}
+
+/*
+ * Motion.
+ *
+ * `reduce` does not mean "no feedback" — it means no large-area movement,
+ * parallax, or spin. Opacity transitions stay, so state changes are still
+ * perceivable to users who rely on them.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Minimum target size (WCAG 2.5.8, AA in 2.2): 24x24 CSS px for anything
+ * pointer-operable, unless there is 24px of clear space around it.
+ */
+.a11y-target {
+  min-width: 24px;
+  min-height: 24px;
+}

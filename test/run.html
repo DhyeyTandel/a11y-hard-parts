@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test suite — accessible component library</title>
+<link rel="stylesheet" href="../src/styles/index.css">
+<style>
+  body {
+    margin: 0;
+    padding: 40px;
+    font-family: var(--font-mono), monospace;
+    font-size: 13px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  h1 { font-family: var(--font-display), serif; font-weight: 400; font-size: 32px; margin: 0 0 4px; }
+  .lede { color: var(--muted); margin: 0 0 24px; max-width: 60ch; line-height: 1.6; }
+  .summary { padding: 10px 14px; border-radius: 4px; font-weight: 600; display: inline-block; }
+  .summary.is-pass { background: var(--success-soft); color: var(--success); }
+  .summary.is-fail { background: var(--error-soft); color: var(--error); }
+  h2 { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 28px 0 8px; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { padding: 3px 0 3px 4px; border-left: 2px solid transparent; }
+  li.is-pass { color: var(--body-color); }
+  li.is-fail { color: var(--error); border-left-color: var(--error); background: var(--error-soft); }
+  pre { margin: 6px 0 6px 16px; white-space: pre-wrap; color: var(--error); }
+  /* The fixture is rendered (not display:none) because hidden elements are
+     never tabbable, which would make every focus test pass vacuously. */
+  #fixture { position: absolute; left: -9999px; top: 0; width: 600px; }
+</style>
+</head>
+<body>
+  <h1>Test suite</h1>
+  <p class="lede">
+    Runs in a real browser: real focus order, real <code>inert</code>, real layout.
+    Screen reader announcements are not asserted here — no automated tool can hear
+    VoiceOver. See the manual checklist in the README.
+  </p>
+  <div id="results" aria-live="off"></div>
+
+  <script type="module">
+    import { run, render } from './harness.js';
+    import './tests/focus.test.js';
+    import './tests/dialog.test.js';
+    import './tests/combobox.test.js';
+    import './tests/tabs.test.js';
+    import './tests/disclosure.test.js';
+    import './tests/table.test.js';
+    import './tests/toast.test.js';
+
+    const results = await run();
+    window.__A11Y_TEST_RESULTS__ = results;
+    render(results, document.getElementById('results'));
+    document.title = `${results.failed ? '✗' : '✓'} ${results.passed}/${results.passed + results.failed} — tests`;
+  </script>
+</body>
+</html>

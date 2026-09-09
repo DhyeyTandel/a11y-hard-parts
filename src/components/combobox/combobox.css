@@ -1,0 +1,92 @@
+.a11y-combobox { position: relative; display: grid; gap: 6px; max-width: 420px; }
+
+.a11y-combobox__field {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--faint);
+  border-radius: var(--r-input);
+}
+
+.a11y-combobox__field:focus-within {
+  border-color: var(--accent);
+  /* The ring goes on the wrapper because the input has no border of its own;
+     :focus-within keeps it visible while the toggle button is pressed. */
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.a11y-combobox input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--ink);
+  background: none;
+  border: 0;
+}
+.a11y-combobox input:focus { outline: none; }
+
+.a11y-combobox__toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-right: 3px;
+  font-size: 11px;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+.a11y-combobox__toggle:hover { background: var(--faint-soft); color: var(--ink); }
+
+.a11y-combobox__listbox {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 4px 0 0;
+  padding: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--card);
+  border: 1px solid var(--faint);
+  border-radius: var(--r-input);
+  box-shadow: var(--shadow-halo);
+}
+.a11y-combobox__listbox[hidden] { display: none; }
+
+.a11y-combobox__option {
+  padding: 9px 12px;
+  border-radius: 5px;
+  color: var(--body-color);
+  cursor: pointer;
+}
+
+/*
+ * The highlighted option. Because DOM focus never moves here, there is no
+ * :focus state to style — the class is driven by aria-activedescendant.
+ *
+ * The 3px accent bar carries the state non-chromatically, so it survives
+ * forced-colors mode and is visible to users who cannot distinguish the
+ * background tint.
+ */
+.a11y-combobox__option.is-active {
+  background: var(--accent-soft);
+  color: var(--ink);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.a11y-combobox__option[aria-disabled="true"] { color: var(--muted-soft); cursor: not-allowed; }
+
+@media (forced-colors: active) {
+  .a11y-combobox__option.is-active {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+}

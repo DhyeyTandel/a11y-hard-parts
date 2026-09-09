@@ -1,0 +1,40 @@
+.a11y-accordion { border-top: 1px solid var(--faint); }
+
+.a11y-accordion__heading { margin: 0; font: inherit; }
+
+.a11y-accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 4px;
+  font-family: var(--font-sans);
+  font-size: 16.5px;
+  font-weight: 560;
+  text-align: left;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--faint);
+  cursor: pointer;
+}
+
+.a11y-accordion__trigger:hover { background: var(--faint-soft); }
+
+/* aria-disabled, not :disabled — the button stays focusable, so the styling
+   must communicate "cannot collapse" without implying "cannot reach". */
+.a11y-accordion__trigger[aria-disabled="true"] { cursor: default; color: var(--muted); }
+
+.a11y-accordion__trigger::after {
+  content: "▾";
+  color: var(--accent);
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+.a11y-accordion__trigger[aria-expanded="true"]::after { transform: rotate(180deg); }
+
+.a11y-accordion__panel {
+  padding: 16px 4px 24px;
+  color: var(--body-color);
+  border-bottom: 1px solid var(--faint);
+}

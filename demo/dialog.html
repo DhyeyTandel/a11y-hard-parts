@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modal dialog — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">APG · Dialog (Modal)</p>
+      <h1>Modal dialog</h1>
+      <p class="lede">
+        Focus goes in, cannot get out, and comes back to exactly where it
+        started — including when the trigger is destroyed while the dialog is open.
+      </p>
+
+      <div class="demo-surface">
+        <p style="margin-top:0">Try each of these with the keyboard alone.</p>
+        <p>
+          <button type="button" class="btn" data-a11y-dialog-open="demo-dialog">Open dialog</button>
+          <button type="button" class="btn btn--ghost" data-a11y-dialog-open="demo-alert">Delete project</button>
+          <button type="button" class="btn btn--ghost" data-a11y-dialog-open="demo-empty">Dialog with nothing focusable</button>
+        </p>
+        <p style="margin-bottom:0">
+          <label for="scratch" style="display:block;font-size:14px;color:var(--muted)">A background field, to prove the background is really inert:</label>
+          <input id="scratch" type="text" style="padding:9px 12px;border:1px solid var(--faint);border-radius:var(--r-input);background:var(--paper-lift);color:var(--ink)">
+        </p>
+      </div>
+
+      <div class="note">
+        <strong>What to check.</strong> Open a dialog, then press <kbd>Tab</kbd>
+        past the last control — focus returns to the first, it does not reach the
+        page. Click the background field: focus refuses to leave. Close with
+        <kbd>Esc</kbd> and focus lands back on the button you opened it from.
+        With VoiceOver, <kbd>VO</kbd>+<kbd>→</kbd> cannot walk out of the dialog.
+      </div>
+
+          <table class="keys">
+            <caption>Keyboard interaction</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Move to the next focusable element inside the dialog. From the last one, wrap to the first.</td></tr>
+            <tr><th scope="row"><kbd>Shift + Tab</kbd></th><td>Move to the previous element. From the first, wrap to the last.</td></tr>
+            <tr><th scope="row"><kbd>Esc</kbd></th><td>Close the dialog and return focus to the element that opened it.</td></tr>
+            </tbody>
+          </table>
+      <h2 class="sub">Notes</h2>
+      <p>
+        The alert variant uses <code>role="alertdialog"</code> and points
+        <code>aria-describedby</code> at the consequence text, so the stakes are
+        read out with the title rather than found later. The third example has no
+        focusable content at all — focus moves to the dialog container itself
+        (<code>tabindex="-1"</code>), which is what makes the title get announced
+        instead of focus silently staying on the now-inert page behind.
+      </p>
+    </section>
+
+    <div class="a11y-dialog" id="demo-dialog" data-a11y-dialog>
+      <div class="a11y-dialog__backdrop" data-a11y-dialog-backdrop></div>
+      <div class="a11y-dialog__panel" data-a11y-dialog-panel>
+        <h2 class="a11y-dialog__title" data-a11y-dialog-title>Rename workspace</h2>
+        <div class="a11y-dialog__body">
+          <label for="ws-name" style="display:block;font-size:14px;color:var(--muted);margin-bottom:4px">Workspace name</label>
+          <input id="ws-name" type="text" value="Northwind"
+                 style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--faint);border-radius:var(--r-input);background:var(--paper-lift);color:var(--ink)">
+        </div>
+        <div class="a11y-dialog__actions">
+          <button type="button" class="btn btn--ghost" data-a11y-dialog-close>Cancel</button>
+          <button type="button" class="btn" data-a11y-dialog-close>Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="a11y-dialog" id="demo-alert" data-a11y-dialog data-a11y-dialog-alert>
+      <div class="a11y-dialog__backdrop" data-a11y-dialog-backdrop></div>
+      <div class="a11y-dialog__panel" data-a11y-dialog-panel>
+        <h2 class="a11y-dialog__title" data-a11y-dialog-title>Delete this project?</h2>
+        <p class="a11y-dialog__body" data-a11y-dialog-description>
+          All 42 files and the deployment history will be removed. This cannot be undone.
+        </p>
+        <div class="a11y-dialog__actions">
+          <button type="button" class="btn btn--ghost" data-a11y-dialog-close>Keep project</button>
+          <button type="button" class="btn" data-a11y-dialog-close style="background:var(--error);border-color:var(--error)">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="a11y-dialog" id="demo-empty" data-a11y-dialog>
+      <div class="a11y-dialog__backdrop" data-a11y-dialog-backdrop></div>
+      <div class="a11y-dialog__panel" data-a11y-dialog-panel>
+        <h2 class="a11y-dialog__title" data-a11y-dialog-title>Nothing to focus here</h2>
+        <p class="a11y-dialog__body">
+          This dialog has no buttons and no fields. Focus is on the dialog itself,
+          so its title is still announced. Press <kbd>Esc</kbd> to close.
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { init } = await import('../src/index.js');
+    init();
+  </script>
+</body>
+</html>

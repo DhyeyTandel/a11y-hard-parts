@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Disclosure & accordion — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">APG · Disclosure and Accordion</p>
+      <h1>Disclosure &amp; accordion</h1>
+      <p class="lede">
+        The simplest pattern in the guide, and still usually wrong — because the
+        mistakes are in the markup, not the JavaScript.
+      </p>
+
+      <h2>Disclosure</h2>
+      <div class="demo-surface">
+        <button type="button" class="a11y-disclosure__trigger" data-a11y-disclosure aria-controls="d-1">
+          What is included in the free plan?
+        </button>
+        <div class="a11y-disclosure__panel" id="d-1">
+          <p style="margin:0">Three projects, 1 GB of storage, and community support.</p>
+        </div>
+
+        <button type="button" class="a11y-disclosure__trigger" data-a11y-disclosure aria-controls="d-2">
+          Can I change plans later?
+        </button>
+        <div class="a11y-disclosure__panel" id="d-2">
+          <p style="margin:0">Yes, at any point. Changes are prorated to the day.</p>
+        </div>
+      </div>
+
+      <h2>Accordion</h2>
+      <p>
+        Each header is a real <code>&lt;h3&gt;</code> wrapping a
+        <code>&lt;button&gt;</code>. That is the whole point: screen reader users
+        navigate long pages by pulling up a list of headings, and an accordion
+        whose sections are not headings is invisible to that workflow.
+      </p>
+      <div class="demo-surface">
+        <div class="a11y-accordion" data-a11y-accordion>
+          <h3 class="a11y-accordion__heading">
+            <button type="button" class="a11y-accordion__trigger" data-a11y-accordion-trigger aria-controls="a-1">Shipping</button>
+          </h3>
+          <div class="a11y-accordion__panel" id="a-1">
+            <p style="margin:0">Dispatched within one working day. Tracked delivery in 2–4 days.</p>
+          </div>
+
+          <h3 class="a11y-accordion__heading">
+            <button type="button" class="a11y-accordion__trigger" data-a11y-accordion-trigger aria-controls="a-2">Returns</button>
+          </h3>
+          <div class="a11y-accordion__panel" id="a-2">
+            <p style="margin:0">Thirty days, unworn, in the original packaging. Return postage is on us.</p>
+          </div>
+
+          <h3 class="a11y-accordion__heading">
+            <button type="button" class="a11y-accordion__trigger" data-a11y-accordion-trigger aria-controls="a-3">Warranty</button>
+          </h3>
+          <div class="a11y-accordion__panel" id="a-3">
+            <p style="margin:0">Two years against manufacturing defects.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="sub">Single-select, one always open</h3>
+      <div class="demo-surface">
+        <div class="a11y-accordion" data-a11y-accordion data-a11y-accordion-multiple="false" data-a11y-accordion-collapse-all="false">
+          <h3 class="a11y-accordion__heading">
+            <button type="button" class="a11y-accordion__trigger" data-a11y-accordion-trigger aria-controls="s-1" aria-expanded="true">Card</button>
+          </h3>
+          <div class="a11y-accordion__panel" id="s-1"><p style="margin:0">Visa, Mastercard, Amex.</p></div>
+
+          <h3 class="a11y-accordion__heading">
+            <button type="button" class="a11y-accordion__trigger" data-a11y-accordion-trigger aria-controls="s-2">Bank transfer</button>
+          </h3>
+          <div class="a11y-accordion__panel" id="s-2"><p style="margin:0">Two to three working days to clear.</p></div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>What to check.</strong> In the last example, the open section's
+        button is <code>aria-disabled</code>, not <code>disabled</code> — so it
+        still receives focus and still announces its state. A <code>disabled</code>
+        button would drop out of the tab order, and the user would find the one
+        section they are reading mysteriously unreachable.
+      </div>
+
+          <table class="keys">
+            <caption>Keyboard interaction</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Move to the next header or into the open panel's content.</td></tr>
+            <tr><th scope="row"><kbd>Enter or Space</kbd></th><td>Toggle the header's section. Native button behaviour — no extra key handler.</td></tr>
+            <tr><th scope="row"><kbd>↓ / ↑</kbd></th><td>Accordion only: move to the next / previous header, wrapping at both ends.</td></tr>
+            <tr><th scope="row"><kbd>Home / End</kbd></th><td>Accordion only: move to the first / last header.</td></tr>
+            </tbody>
+          </table>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { init } = await import('../src/index.js');
+    init();
+  </script>
+</body>
+</html>

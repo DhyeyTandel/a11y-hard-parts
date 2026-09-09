@@ -1,0 +1,69 @@
+.a11y-toasts {
+  position: fixed;
+  z-index: 200;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  width: min(380px, calc(100vw - 48px));
+  /* The region must not block clicks on the page behind it when empty. */
+  pointer-events: none;
+}
+
+.a11y-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 14px 14px 16px;
+  pointer-events: auto;
+  background: var(--card);
+  border: 1px solid var(--faint);
+  border-left: 3px solid var(--muted);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-halo);
+  animation: a11y-toast-in var(--dur) var(--ease-spring);
+}
+
+/* Motion preference is read in JS as well as CSS, because the enter animation
+   is what makes a toast feel like it "arrives" — with reduce, it simply is. */
+.a11y-toast[data-reduced-motion] { animation: none; }
+
+.a11y-toast--success { border-left-color: var(--success); }
+.a11y-toast--warning { border-left-color: var(--warning); }
+.a11y-toast--error { border-left-color: var(--error); }
+.a11y-toast--info { border-left-color: var(--blurple); }
+
+.a11y-toast__message { flex: 1; margin: 0; font-size: 15px; color: var(--ink-soft); }
+
+.a11y-toast__action {
+  padding: 4px 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  border: 0;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+
+.a11y-toast__dismiss {
+  /* 24px minimum target (WCAG 2.5.8) even though the glyph is smaller. */
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+.a11y-toast__dismiss:hover { background: var(--faint-soft); color: var(--ink); }
+
+@keyframes a11y-toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+}
