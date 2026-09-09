@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Combobox — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">APG · Combobox (ARIA 1.2)</p>
+      <h1>Combobox</h1>
+      <p class="lede">
+        DOM focus never leaves the text field. The highlighted option is carried
+        by <code>aria-activedescendant</code> — which is what lets you keep
+        typing while an option is highlighted.
+      </p>
+
+      <div class="demo-surface">
+        <div class="a11y-combobox" data-a11y-combobox id="fruit-combobox">
+          <label for="fruit" style="font-size:14px;color:var(--muted)">Fruit</label>
+          <div class="a11y-combobox__field">
+            <input id="fruit" type="text" placeholder="Start typing, or press ↓">
+            <button type="button" class="a11y-combobox__toggle" data-a11y-combobox-toggle>▾</button>
+          </div>
+          <ul class="a11y-combobox__listbox" data-a11y-combobox-listbox></ul>
+        </div>
+
+        <p style="margin:28px 0 0;font-size:15px;color:var(--muted)">
+          Selected: <strong id="fruit-output" style="color:var(--ink)">nothing yet</strong>
+        </p>
+      </div>
+
+      <div class="demo-surface">
+        <div class="a11y-combobox" data-a11y-combobox id="slow-combobox">
+          <label for="airport" style="font-size:14px;color:var(--muted)">Airport (simulated 400 ms network)</label>
+          <div class="a11y-combobox__field">
+            <input id="airport" type="text" placeholder="Type at least 2 characters">
+            <button type="button" class="a11y-combobox__toggle" data-a11y-combobox-toggle>▾</button>
+          </div>
+          <ul class="a11y-combobox__listbox" data-a11y-combobox-listbox></ul>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>What to check.</strong> With VoiceOver on, press <kbd>↓</kbd> and
+        listen: you should hear the option name and its position, without focus
+        leaving the field. Type quickly in the second combobox — a slow response
+        for an earlier query must never overwrite the list you are already
+        navigating.
+      </div>
+
+          <table class="keys">
+            <caption>Keyboard interaction — text field</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>↓</kbd></th><td>Open the popup and highlight the first option. If already open, move to the next option, wrapping at the end.</td></tr>
+            <tr><th scope="row"><kbd>↑</kbd></th><td>Open the popup and highlight the last option. If already open, move to the previous option.</td></tr>
+            <tr><th scope="row"><kbd>Alt + ↓</kbd></th><td>Open the popup without highlighting anything.</td></tr>
+            <tr><th scope="row"><kbd>Alt + ↑</kbd></th><td>Close the popup, keeping the current value.</td></tr>
+            <tr><th scope="row"><kbd>Enter</kbd></th><td>Commit the highlighted option. With nothing highlighted, the keystroke passes through to the form.</td></tr>
+            <tr><th scope="row"><kbd>Esc</kbd></th><td>First press closes the popup. Second press clears the field.</td></tr>
+            <tr><th scope="row"><kbd>Home / End</kbd></th><td>Move the text cursor, per the APG, and drop the highlight so Enter cannot commit a stale option.</td></tr>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Commit the highlighted option, then move on.</td></tr>
+            <tr><th scope="row"><kbd>Printable character</kbd></th><td>Filter the list. Nothing is auto-highlighted.</td></tr>
+            </tbody>
+          </table>
+      <h2 class="sub">Notes</h2>
+      <p>
+        The result count is announced through a polite live region scoped to the
+        widget, debounced by 350 ms. Announcing on every keystroke floods the
+        speech queue, and the user never hears the count that actually matters.
+      </p>
+      <p>
+        Nothing is highlighted automatically while typing. Auto-highlighting the
+        first result is common and quietly hostile: <kbd>Enter</kbd> then commits
+        a value the user never chose and, on a form, often submits it too.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { Combobox } = await import('../src/components/combobox/combobox.js');
+
+    const FRUIT = ['Apple', 'Apricot', 'Avocado', 'Banana', 'Blackberry', 'Blackcurrant',
+      'Blueberry', 'Cherry', 'Clementine', 'Cranberry', 'Damson', 'Date', 'Dragonfruit',
+      'Elderberry', 'Fig', 'Gooseberry', 'Grape', 'Grapefruit', 'Guava', 'Kiwi', 'Lemon',
+      'Lime', 'Lychee', 'Mango', 'Melon', 'Nectarine', 'Orange', 'Papaya', 'Passionfruit',
+      'Peach', 'Pear', 'Persimmon', 'Pineapple', 'Plum', 'Pomegranate', 'Quince',
+      'Raspberry', 'Redcurrant', 'Rhubarb', 'Satsuma', 'Strawberry', 'Tangerine'];
+
+    const output = document.getElementById('fruit-output');
+    new Combobox(document.getElementById('fruit-combobox'), {
+      source: FRUIT,
+      onSelect: (item) => { output.textContent = item.label; },
+    });
+
+    const AIRPORTS = ['Amsterdam Schiphol', 'Athens', 'Auckland', 'Bangalore Kempegowda',
+      'Barcelona El Prat', 'Berlin Brandenburg', 'Boston Logan', 'Chicago O\u2019Hare',
+      'Copenhagen Kastrup', 'Delhi Indira Gandhi', 'Dublin', 'Frankfurt', 'Helsinki Vantaa',
+      'Lisbon Portela', 'London Heathrow', 'Madrid Barajas', 'Mumbai Chhatrapati Shivaji',
+      'Oslo Gardermoen', 'Paris Charles de Gaulle', 'Reykjavik Keflavik', 'Rome Fiumicino',
+      'San Francisco', 'Seattle Tacoma', 'Singapore Changi', 'Stockholm Arlanda',
+      'Sydney Kingsford Smith', 'Tokyo Haneda', 'Vienna', 'Warsaw Chopin', 'Zurich'];
+
+    new Combobox(document.getElementById('slow-combobox'), {
+      minChars: 2,
+      // Deliberately slow and jittery, so a stale response can overtake a fresh
+      // one. The request token inside Combobox is what stops it winning.
+      source: async (query) => {
+        await new Promise((resolve) => setTimeout(resolve, 250 + Math.random() * 300));
+        const needle = query.toLowerCase();
+        return AIRPORTS.filter((name) => name.toLowerCase().includes(needle));
+      },
+    });
+  </script>
+</body>
+</html>

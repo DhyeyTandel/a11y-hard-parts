@@ -1,0 +1,62 @@
+.a11y-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.a11y-dialog[hidden] { display: none; }
+
+.a11y-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 20, 15, 0.55);
+  animation: a11y-fade var(--dur-fast) var(--ease-swift);
+}
+
+.a11y-dialog__panel {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 32px;
+  background: var(--card);
+  border: 1px solid var(--faint);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-lift);
+  animation: a11y-dialog-in var(--dur) var(--ease-spring);
+}
+
+/* The panel is focusable (tabindex="-1") but focusing it programmatically
+   should not paint a ring — the user did not tab here. :focus-visible already
+   handles that; this is belt and braces for older engines. */
+.a11y-dialog__panel:focus { outline: none; }
+.a11y-dialog__panel:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: -1px;
+}
+
+.a11y-dialog__title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.a11y-dialog__body { margin: 0 0 24px; color: var(--body-color); }
+
+.a11y-dialog__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+@keyframes a11y-fade { from { opacity: 0; } }
+@keyframes a11y-dialog-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+}

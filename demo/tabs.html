@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tabs — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">APG · Tabs</p>
+      <h1>Tabs</h1>
+      <p class="lede">
+        A tab strip is <em>one</em> tab stop, not one per tab. The arrow keys
+        move between tabs; <kbd>Tab</kbd> takes you straight into the panel.
+      </p>
+
+      <div class="demo-surface">
+        <div data-a11y-tabs>
+          <div class="a11y-tabs__list" role="tablist" aria-label="Account settings">
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="tp-profile">Profile</button>
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="tp-billing">Billing</button>
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="tp-sessions">Sessions</button>
+          </div>
+          <div class="a11y-tabs__panel" id="tp-profile">
+            <p style="margin-top:0">Your display name and avatar. This panel contains a link, so it is not itself a tab stop —
+              <a href="#tp-profile">here is that link</a>.</p>
+          </div>
+          <div class="a11y-tabs__panel" id="tp-billing">
+            <p style="margin-top:0">Plain text, nothing focusable. This panel <em>does</em> get
+              <code>tabindex="0"</code>, so <kbd>Tab</kbd> from the tab strip reaches the content
+              and a screen reader can read it.</p>
+          </div>
+          <div class="a11y-tabs__panel" id="tp-sessions">
+            <p style="margin-top:0">Three active sessions.</p>
+            <button type="button" class="btn btn--ghost">Revoke all</button>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sub">Manual activation</h2>
+      <p>
+        Arrowing moves focus but does not switch panels until <kbd>Enter</kbd> or
+        <kbd>Space</kbd>. Use this when showing a panel is expensive — with
+        automatic activation, arrowing across five tabs fires five requests.
+      </p>
+      <div class="demo-surface">
+        <div data-a11y-tabs data-a11y-tabs-activation="manual">
+          <div class="a11y-tabs__list" role="tablist" aria-label="Reports (manual activation)">
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="mp-1">Daily</button>
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="mp-2">Weekly</button>
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="mp-3">Quarterly</button>
+          </div>
+          <div class="a11y-tabs__panel" id="mp-1"><p style="margin:0">Daily report — a fresh query each time.</p></div>
+          <div class="a11y-tabs__panel" id="mp-2"><p style="margin:0">Weekly report.</p></div>
+          <div class="a11y-tabs__panel" id="mp-3"><p style="margin:0">Quarterly report.</p></div>
+        </div>
+      </div>
+
+      <h2 class="sub">Vertical orientation</h2>
+      <div class="demo-surface">
+        <div data-a11y-tabs data-a11y-tabs-orientation="vertical" style="display:flex;gap:24px">
+          <div class="a11y-tabs__list" role="tablist" aria-label="Documentation" aria-orientation="vertical">
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="vp-1">Install</button>
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="vp-2">Usage</button>
+            <button class="a11y-tabs__tab" data-a11y-tab aria-controls="vp-3">Theming</button>
+          </div>
+          <div style="flex:1">
+            <div class="a11y-tabs__panel" id="vp-1"><p style="margin:0">Copy <code>src/</code> into your project.</p></div>
+            <div class="a11y-tabs__panel" id="vp-2"><p style="margin:0">Import the component and call <code>init()</code>.</p></div>
+            <div class="a11y-tabs__panel" id="vp-3"><p style="margin:0">Override the custom properties in <code>tokens.css</code>.</p></div>
+          </div>
+        </div>
+      </div>
+
+          <table class="keys">
+            <caption>Keyboard interaction</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Move into the tab strip (one stop), then out to the panel.</td></tr>
+            <tr><th scope="row"><kbd>→ / ←</kbd></th><td>Horizontal strip: move to the next / previous tab, wrapping at both ends.</td></tr>
+            <tr><th scope="row"><kbd>↓ / ↑</kbd></th><td>Vertical strip: same, on the vertical axis.</td></tr>
+            <tr><th scope="row"><kbd>Home / End</kbd></th><td>Move to the first / last tab.</td></tr>
+            <tr><th scope="row"><kbd>Enter or Space</kbd></th><td>Manual activation only: show the focused tab's panel.</td></tr>
+            </tbody>
+          </table>
+      <h2 class="sub">Notes</h2>
+      <p>
+        The arrows for the <em>other</em> axis are deliberately left alone. A
+        horizontal tab strip that swallows <kbd>↓</kbd> breaks the page's normal
+        scrolling for anyone who happens to have focus in the strip.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { init } = await import('../src/index.js');
+    init();
+  </script>
+</body>
+</html>

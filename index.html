@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accessible component library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="src/styles/index.css">
+  <link rel="stylesheet" href="demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="index.html">Overview</a>
+        <a href="demo/dialog.html">Dialog</a>
+        <a href="demo/combobox.html">Combobox</a>
+        <a href="demo/tabs.html">Tabs</a>
+        <a href="demo/disclosure.html">Disclosure</a>
+        <a href="demo/table.html">Table</a>
+        <a href="demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap">
+      <p class="eyebrow">ARIA Authoring Practices, implemented</p>
+      <h1>The components that are<br>actually <em>hard</em> to get right.</h1>
+      <p class="lede">
+        Not buttons and cards. A focus trap that cannot be escaped, a combobox
+        that keeps DOM focus in the input, a live region that actually
+        announces. Zero dependencies, no build step, 1,400 lines of plain
+        ES modules — and 600 lines of comments explaining why.
+      </p>
+
+      <ul class="card-grid">
+        <li><a class="card" href="demo/dialog.html">
+          <h2>Modal dialog</h2>
+          <p>Focus trap, focus restoration, <code>inert</code> background, Escape to dismiss.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/combobox.html">
+          <h2>Combobox</h2>
+          <p>ARIA 1.2, <code>aria-activedescendant</code>, debounced result count.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/tabs.html">
+          <h2>Tabs</h2>
+          <p>Roving tabindex, arrow navigation, automatic and manual activation.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/disclosure.html">
+          <h2>Disclosure &amp; accordion</h2>
+          <p><code>aria-expanded</code>, real heading structure, arrow navigation.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/table.html">
+          <h2>Sortable table</h2>
+          <p><code>aria-sort</code> on one header, <code>scope</code>, caption, announced order.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/toast.html">
+          <h2>Toasts</h2>
+          <p>Politeness levels, pausable timers, focus that never disappears.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+      </ul>
+    </section>
+
+    <section class="block wrap narrow">
+      <h2>What this is trying to prove</h2>
+      <p>
+        Most component libraries that advertise accessibility have a focus trap
+        built on a single <code>keydown</code> handler for <kbd>Tab</kbd>. That
+        handler is escapable in four ways: a click on a background control, a
+        script calling <code>.focus()</code>, focus returning from the browser's
+        own chrome, and a screen reader's virtual cursor, which does not use
+        <kbd>Tab</kbd> at all.
+      </p>
+      <p>
+        The implementation here uses three mechanisms — <code>inert</code> on
+        the background, a wrapping <kbd>Tab</kbd> handler, and a
+        <code>focusin</code> backstop — because each one has a hole the other
+        two cover. The reasoning for every such decision is written into the
+        source, next to the code it explains.
+      </p>
+
+      <h2>Verification</h2>
+      <p>
+        113 automated assertions run in a real browser — real focus order, real
+        <code>inert</code>, real layout — because jsdom implements none of
+        those. Announcements are a separate matter: no automated tool can hear
+        VoiceOver, so each component ships a manual test script in the README.
+      </p>
+      <p style="margin-top:24px">
+        <a class="btn" href="test/run.html">Run the test suite →</a>
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from './demo/demo.js';
+    initChrome();
+    // The overview page has no components of its own.
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+.a11y-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.a11y-table caption {
+  padding-bottom: 12px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  text-align: left;
+  color: var(--ink);
+}
+
+.a11y-table th,
+.a11y-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--faint);
+}
+
+.a11y-table thead th { padding: 0; border-bottom: 1px solid var(--ink); }
+
+.a11y-table thead th button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.a11y-table thead th button:hover { color: var(--ink); background: var(--faint-soft); }
+.a11y-table th[aria-sort] button { color: var(--accent); }
+
+.a11y-table__sort-indicator { font-size: 9px; }
+
+.a11y-table tbody th[scope="row"] { font-weight: 560; color: var(--ink); }
+.a11y-table tbody tr:hover { background: var(--faint-soft); }
+
+@media (forced-colors: active) {
+  .a11y-table th[aria-sort] button { forced-color-adjust: none; color: Highlight; }
+}

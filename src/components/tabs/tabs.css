@@ -1,0 +1,63 @@
+.a11y-tabs__list {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--faint);
+}
+
+.a11y-tabs__list[aria-orientation="vertical"] {
+  flex-direction: column;
+  border-bottom: 0;
+  border-right: 1px solid var(--faint);
+}
+
+.a11y-tabs__tab {
+  position: relative;
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 560;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: var(--r-input) var(--r-input) 0 0;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-swift);
+}
+
+.a11y-tabs__tab:hover { color: var(--ink); background: var(--faint-soft); }
+
+/*
+ * Selected state is styled from aria-selected, not from a JS-managed class.
+ * One source of truth means the visual state and the announced state cannot
+ * drift apart — if the underline is showing, aria-selected is true.
+ */
+.a11y-tabs__tab[aria-selected="true"] { color: var(--ink); }
+.a11y-tabs__tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.a11y-tabs__list[aria-orientation="vertical"] .a11y-tabs__tab[aria-selected="true"]::after {
+  left: auto;
+  right: -1px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  height: auto;
+}
+
+.a11y-tabs__panel { padding: 24px 4px; color: var(--body-color); }
+.a11y-tabs__panel:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+@media (forced-colors: active) {
+  /* The underline is a background, which forced-colors strips. Restate it. */
+  .a11y-tabs__tab[aria-selected="true"] { forced-color-adjust: none; color: Highlight; }
+  .a11y-tabs__tab[aria-selected="true"]::after { background: Highlight; }
+}

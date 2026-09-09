@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sortable table — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap">
+      <p class="eyebrow">APG · Table with sortable columns</p>
+      <h1>Sortable data table</h1>
+      <p class="lede narrow">
+        A caption for the name, <code>scope</code> so cells are read with their
+        headers, <code>aria-sort</code> on exactly one column, and an
+        announcement — because re-sorting silently rewrites everything below the
+        user's reading position.
+      </p>
+
+      <div class="demo-surface">
+        <table class="a11y-table" data-a11y-sortable-table>
+          <caption>Open pull requests, by repository</caption>
+          <thead>
+            <tr>
+              <th scope="col" data-sort-type="text"><button type="button">Title</button></th>
+              <th scope="col" data-sort-type="text"><button type="button">Author</button></th>
+              <th scope="col" data-sort-type="number"><button type="button">Files</button></th>
+              <th scope="col" data-sort-type="date"><button type="button">Opened</button></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Fix focus restoration on unmount</th><td>rin</td><td>3</td><td data-sort-value="2026-08-14">14 Aug</td></tr>
+            <tr><th scope="row">Add inert polyfill fallback</th><td>ada</td><td>12</td><td data-sort-value="2026-07-02">2 Jul</td></tr>
+            <tr><th scope="row">Combobox: debounce announcements</th><td>rin</td><td>2</td><td data-sort-value="2026-09-01">1 Sep</td></tr>
+            <tr><th scope="row">Roving tabindex for vertical tabs</th><td>kwan</td><td>7</td><td data-sort-value="2026-06-19">19 Jun</td></tr>
+            <tr><th scope="row">Docs: VoiceOver test script</th><td>ada</td><td></td><td data-sort-value="2026-08-30">30 Aug</td></tr>
+            <tr><th scope="row">Toast timers pause on hover</th><td>kwan</td><td>4</td><td data-sort-value="2026-05-08">8 May</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note narrow">
+        <strong>What to check.</strong> Sort by Files, then reverse it. The row
+        with no file count stays at the bottom both times — reversing a sort
+        should not fill the top of the table with blanks. With VoiceOver, move
+        across a row and listen: each cell is read with its column header, and
+        the row header identifies the row.
+      </div>
+
+      <div class="narrow">
+          <table class="keys">
+            <caption>Keyboard interaction</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Move to the next column header button.</td></tr>
+            <tr><th scope="row"><kbd>Enter or Space</kbd></th><td>Sort by that column. Activating the sorted column again reverses the direction.</td></tr>
+            </tbody>
+          </table>
+        <h2 class="sub">Notes</h2>
+        <p>
+          The sort control is a <code>&lt;button&gt;</code> inside the
+          <code>&lt;th&gt;</code>, not a click handler on the <code>th</code>
+          itself. The header keeps its table semantics; the button provides an
+          operable control with a real accessible name and a real focus ring.
+        </p>
+        <p>
+          The <span aria-hidden="true">▲▼</span> arrow is
+          <code>aria-hidden</code>. <code>aria-sort</code> already carries the
+          state, and announcing "Title ▼" after it just describes a glyph the
+          user cannot see.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { init } = await import('../src/index.js');
+    init();
+  </script>
+</body>
+</html>

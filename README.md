@@ -1,0 +1,458 @@
+# Accessible components
+
+Seven components built against the [ARIA Authoring Practices Guide][apg], chosen
+because they are the ones that are genuinely hard to get right — not buttons and
+cards.
+
+Zero dependencies. No build step. Plain ES modules and CSS custom properties.
+
+```bash
+./serve.sh 8080     # ES modules need an http origin; file:// blocks them
+```
+
+Then open <http://localhost:8080/> for the demos, or
+<http://localhost:8080/test/run.html> for the test suite.
+
+---
+
+## Contents
+
+- [What is here, and why](#what-is-here-and-why)
+- [Usage](#usage)
+- [Keyboard interaction model](#keyboard-interaction-model) — the reference for each component
+- [Focus management](#focus-management)
+- [Live regions](#live-regions)
+- [Testing](#testing)
+- [VoiceOver test scripts](#voiceover-test-scripts)
+- [Browser and OS behaviour](#browser-and-os-behaviour)
+- [Limitations](#limitations)
+
+---
+
+## What is here, and why
+
+| Component | The hard part |
+|---|---|
+| **Modal dialog** | A focus trap that cannot be escaped, focus restoration when the trigger is gone, a background that is inert to the virtual cursor and not just to `Tab` |
+| **Combobox** | ARIA 1.2 with `aria-activedescendant`, so DOM focus never leaves the input; debounced result-count announcements; stale async responses that must not win |
+| **Tabs** | Roving tabindex, so a ten-tab strip is one tab stop; panels that become focusable only when they hold nothing focusable |
+| **Disclosure** | Three markup mistakes that no amount of JavaScript fixes |
+| **Accordion** | Real heading structure, and `aria-disabled` rather than `disabled` for a panel that cannot be collapsed |
+| **Sortable table** | `aria-sort` on exactly one header, `scope` on every header, a caption, and an announcement — because re-sorting silently rewrites everything below the reading position |
+| **Toasts** | Live regions that actually announce, politeness that is not always `assertive`, timers that pause, and focus that does not vanish |
+
+Every non-obvious decision is explained in a comment next to the code it
+explains, rather than here. If you want the reasoning for a specific behaviour,
+the source is the documentation.
+
+---
+
+## Usage
+
+Declarative — mark up the HTML and call `init()`:
+
+```js
+import { init } from './src/index.js';
+init();   // wires every [data-a11y-*] component on the page
+```
+
+Imperative, for anything that needs configuration:
+
+```js
+import { Dialog } from './src/components/dialog/dialog.js';
+import { Combobox } from './src/components/combobox/combobox.js';
+
+const dialog = new Dialog(document.querySelector('#confirm'), {
+  alert: true,
+  initialFocus: '#cancel',
+});
+dialog.open(triggerButton);   // triggerButton gets focus back on close
+
+new Combobox(document.querySelector('#fruit'), {
+  source: async (query) => fetch(`/search?q=${query}`).then((r) => r.json()),
+  minChars: 2,
+  onSelect: (item) => console.log(item),
+});
+```
+
+Styling is entirely custom properties. Override `src/styles/tokens.css` to
+rebrand; no component CSS needs to change.
+
+---
+
+## Keyboard interaction model
+
+This is the contract. Anything not listed is deliberately left to the browser —
+a widget that swallows a key it does not need breaks the user's normal
+navigation.
+
+### Modal dialog
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Tab</kbd> | Move to the next focusable element in the dialog. From the last, wrap to the first. |
+| <kbd>Shift</kbd> + <kbd>Tab</kbd> | Move to the previous element. From the first, wrap to the last. |
+| <kbd>Esc</kbd> | Close, and return focus to the element that opened the dialog. |
+
+**On open**, focus moves to: the configured `initialFocus`, else `[autofocus]`,
+else the first tabbable element, else the dialog container itself (which carries
+`tabindex="-1"` so its accessible name is still announced).
+
+**On close**, focus returns to: the configured `returnFocus`, else the trigger
+passed to `open()`, else whatever had focus when the dialog opened. If that
+element has been removed from the DOM while the dialog was open, the configured
+`fallbackFocus` is used, and `<body>` as a last resort.
+
+The background is made `inert`, which removes it from the tab order, from hit
+testing, **and from the accessibility tree** — so a VoiceOver user cannot walk
+out of the dialog with <kbd>VO</kbd> + <kbd>→</kbd> either.
+
+### Combobox (list autocomplete, manual selection)
+
+DOM focus stays on the text input at all times. The highlighted option is
+communicated with `aria-activedescendant`.
+
+| Key | Behaviour |
+|---|---|
+| <kbd>↓</kbd> | Closed: open and highlight the first option. Open: move to the next option, wrapping at the end. |
+| <kbd>↑</kbd> | Closed: open and highlight the last option. Open: move to the previous option, wrapping at the start. |
+| <kbd>Alt</kbd> + <kbd>↓</kbd> | Open the popup without highlighting anything. |
+| <kbd>Alt</kbd> + <kbd>↑</kbd> | Close the popup, keeping the current value. |
+| <kbd>Enter</kbd> | Commit the highlighted option. With nothing highlighted the keystroke is **not** consumed, so form submission still works. |
+| <kbd>Esc</kbd> | First press: close the popup, keep the value. Second press: clear the field. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Move the text cursor (per the APG, for an editable combobox) and drop the highlight, so <kbd>Enter</kbd> cannot commit a stale option. |
+| <kbd>Tab</kbd> | Commit the highlighted option, then move focus on. Disable with `selectOnTab: false`. |
+| Printable character | Filter. **Nothing is auto-highlighted** — auto-highlighting means <kbd>Enter</kbd> commits a value the user never chose. |
+
+The toggle button is `tabindex="-1"`: it duplicates <kbd>Alt</kbd> + <kbd>↓</kbd>,
+so making it a tab stop adds a stop that announces nothing new. It keeps an
+accessible name and stays reachable in browse mode.
+
+Result counts are announced through a polite live region scoped to the widget,
+debounced by 350 ms. Announcing on every keystroke floods the speech queue and
+the user never hears the count that matters.
+
+### Tabs
+
+The tab strip is **one** tab stop (roving tabindex).
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Tab</kbd> | Into the strip (one stop), then out to the panel. |
+| <kbd>→</kbd> / <kbd>←</kbd> | Horizontal strip: next / previous tab, wrapping at both ends. |
+| <kbd>↓</kbd> / <kbd>↑</kbd> | Vertical strip (`aria-orientation="vertical"`): the same, on the vertical axis. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | First / last tab. |
+| <kbd>Enter</kbd> or <kbd>Space</kbd> | Manual activation only: show the focused tab's panel. |
+
+Arrows for the *other* axis are left alone: a horizontal strip that swallows
+<kbd>↓</kbd> breaks page scrolling for anyone with focus in the strip.
+
+**Automatic activation** (default) switches the panel as focus moves.
+**Manual activation** (`activation: 'manual'`) requires <kbd>Enter</kbd> or
+<kbd>Space</kbd>; use it when showing a panel is expensive, because otherwise
+arrowing across five tabs fires five requests.
+
+The active panel gets `tabindex="0"` **only when it contains nothing focusable**,
+so it is still reachable and readable. If it already holds focusable content,
+adding a stop would cost the user an extra <kbd>Tab</kbd> for nothing. This is
+recomputed each time a panel is shown, because panel content changes.
+
+### Disclosure
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Enter</kbd> or <kbd>Space</kbd> | Toggle. Native `<button>` behaviour — there is deliberately no key handler, because adding one causes double activation. |
+
+The three mistakes this pattern exists to avoid:
+
+1. A `<div>` or `<a>` as the trigger. A link promises navigation; a div promises
+   nothing.
+2. `aria-expanded` on the region instead of on the control.
+3. `aria-hidden` used to hide the panel instead of `hidden`. That leaves the
+   content in the tab order while hiding it from the screen reader — the worst
+   of both worlds.
+
+### Accordion
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Enter</kbd> or <kbd>Space</kbd> | Toggle the focused section. |
+| <kbd>↓</kbd> / <kbd>↑</kbd> | Next / previous header, wrapping at both ends. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | First / last header. |
+| <kbd>Tab</kbd> | Next header, or into the open panel's content. |
+
+Each header **must** be a real heading wrapping a button:
+
+```html
+<h3><button data-a11y-accordion-trigger aria-controls="s1">Shipping</button></h3>
+```
+
+Screen reader users navigate long pages by pulling up a list of headings. An
+accordion whose sections are not headings is invisible to that workflow. The
+level must match the surrounding outline; the component warns rather than
+rewriting it, because only the page author knows the outline.
+
+With `allowCollapseAll: false`, the sole open header gets **`aria-disabled`**,
+never `disabled` — a disabled button leaves the tab order, and the user would
+find the one section they are reading unreachable.
+
+`role="region"` on panels is on by default and worth it for a handful of
+substantial sections. Turn it off (`regionPanels: false`) for a long FAQ, where
+forty landmarks is noise rather than navigation.
+
+### Sortable table
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Tab</kbd> | Next column header button. |
+| <kbd>Enter</kbd> or <kbd>Space</kbd> | Sort by that column. Activating the sorted column again reverses the direction. |
+
+- `<caption>` is the table's accessible name. Without it the user hears
+  "table, 4 columns, 240 rows" and has no idea what they are in.
+- `scope="col"` on column headers and `scope="row"` on the identifying cell of
+  each row is what makes the screen reader read "Price, £42" rather than "£42".
+- `aria-sort` is on **exactly one** header. The others have the attribute
+  removed, not set to `"none"`.
+- The control is a `<button>` inside the `<th>`, not a handler on the `<th>`.
+- The sort arrow is `aria-hidden`, and the announcement is built from the
+  accessible name, so it says "sorted by Title" and not "sorted by Title ▼".
+- Missing values sort to the bottom in **both** directions. Ranking them inside
+  the direction flip means reversing a sort fills the top of the table with
+  blanks.
+
+### Toasts
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Tab</kbd> | Reach a toast's action and dismiss buttons. Focus anywhere in the stack pauses every timer. |
+| <kbd>Enter</kbd> or <kbd>Space</kbd> | Activate the focused button. |
+
+The stack is a labelled `region` landmark, so a screen reader user can jump to it
+with the rotor and review notifications at their own pace instead of chasing them
+before they expire.
+
+---
+
+## Focus management
+
+The focus trap uses **three** mechanisms, because each one alone has a hole.
+
+| Mechanism | Covers | Hole it leaves |
+|---|---|---|
+| `inert` on the background | Tab order, pointer events, **and the accessibility tree** | <kbd>Tab</kbd> can still leave the document into browser chrome and re-enter at the top |
+| <kbd>Tab</kbd> keydown wrap | The document→chrome→document round trip | Only fires for <kbd>Tab</kbd> |
+| `focusin` backstop | A click on a still-focusable element, a script calling `.focus()`, an autofocusing embed | — |
+
+A trap built only on the second is escapable in four ways, and most are.
+
+`aria-modal="true"` is set as well, but it is a *hint* to assistive technology
+about the accessibility tree. It does nothing for the tab order and nothing for
+pointer events. `inert` is the enforcement.
+
+### `getTabbables()`
+
+There is no DOM API for "what will `Tab` actually reach", so every trap
+reimplements the browser's rules. The cases that are usually missed, each of
+which is a real bug that reaches a keyboard user:
+
+- A disabled `<fieldset>` disables its descendants **except** those in its first
+  `<legend>`.
+- A radio group is **one** tab stop — the checked radio, or the first one if none
+  is checked. Missing this makes a trap leak tab stops.
+- Elements inside a closed `<details>` have no client rects and are not tabbable.
+- The visually-hidden clip pattern (1×1, `clip-path`) *is* tabbable — excluding it
+  breaks skip links.
+- A `<details>` with a `<summary>` is not itself tabbable; the summary is.
+- Positive `tabindex` sorts before `tabindex="0"`. It is an antipattern, but a
+  trap that ignores it wraps to the wrong element on pages that use it.
+
+---
+
+## Live regions
+
+Five rules, in the order that breaking them causes damage:
+
+1. **The region must exist before the text goes into it.** A region created and
+   populated in the same task is usually not announced at all — assistive
+   technology reacts to mutations *inside* a region it is already observing, not
+   to the arrival of new DOM. `mountLiveRegions()` runs at init.
+2. **Re-setting the same string is not a mutation.** Two identical "Copied"
+   messages announce once. Clear the region, then write on a later task.
+3. **`aria-atomic="true"` is for a single-message region** and wrong for an
+   append-only log, where it re-reads everything each time.
+4. **Do not make the visible toast stack the live region.** It mutates
+   constantly, and `role="alert"` implies `aria-atomic="true"`, so a second toast
+   re-announces the first. Keep the stack a plain landmark and mirror messages
+   into separate hidden regions.
+5. **`assertive` interrupts the user mid-sentence** — including mid-sentence in
+   the thing they were reading to decide what to do. Errors only.
+
+The gap between clearing and writing uses a double `requestAnimationFrame` when
+the page is visible, and a `MessageChannel` message when it is hidden — rAF does
+not fire in a backgrounded tab, and `setTimeout` there is clamped to roughly one
+second per timer.
+
+---
+
+## Testing
+
+```bash
+./serve.sh 8080 && open http://localhost:8080/test/run.html
+```
+
+**113 assertions, run in a real browser.** Deliberately not jsdom: it implements
+neither sequential focus navigation, nor `inert`, nor `:focus-visible`, nor
+layout — so `getClientRects()` is always empty and every element looks hidden. A
+focus trap that passes in jsdom tells you nothing about whether <kbd>Tab</kbd>
+escapes it in Safari.
+
+Two limits worth knowing:
+
+- **Synthetic `KeyboardEvent`s do not trigger default actions.** Dispatching
+  <kbd>Tab</kbd> does not move focus. That is fine for testing handlers that call
+  `preventDefault()` and `.focus()` themselves, which is what these do, but it
+  means a green suite is not proof of native focus order. Verify that by hand.
+- **A document without system focus fires no focus events at all** — a
+  background tab, an unfocused pane, a headless run. `activeElement` still
+  updates, but `focus`, `focusin` and `focusout` never fire, so any handler that
+  reacts to focus movement looks broken. The harness detects this and synthesises
+  the events; in a focused window that path is skipped entirely.
+
+**No automated tool can hear VoiceOver.** ARIA attributes being correct is
+necessary and not sufficient — the announcement is what the user actually gets,
+and it depends on the AT/browser pair. That is what the next section is for.
+
+---
+
+## VoiceOver test scripts
+
+Run on macOS, in Safari. <kbd>VO</kbd> is <kbd>Control</kbd> + <kbd>Option</kbd>.
+Turn VoiceOver on with <kbd>⌘</kbd> + <kbd>F5</kbd>.
+
+Useful commands: <kbd>VO</kbd> + <kbd>→</kbd> / <kbd>←</kbd> move the virtual
+cursor · <kbd>VO</kbd> + <kbd>U</kbd> opens the rotor · <kbd>VO</kbd> +
+<kbd>Space</kbd> activates.
+
+### Dialog
+
+- [ ] Open a dialog. It announces the **title and the role** ("Rename workspace,
+      dialog"), not just "dialog".
+- [ ] The alert dialog also reads its description with the title.
+- [ ] <kbd>VO</kbd> + <kbd>→</kbd> repeatedly. The virtual cursor **cannot leave
+      the dialog** — this is the check `aria-modal` alone fails.
+- [ ] <kbd>VO</kbd> + <kbd>U</kbd> → Headings. Only the dialog's heading is
+      listed; the page behind it is gone.
+- [ ] <kbd>Tab</kbd> past the last control. Focus wraps to the first.
+- [ ] <kbd>Esc</kbd>. Focus returns to the trigger and VoiceOver announces that
+      button — not the top of the page.
+- [ ] Open "Dialog with nothing focusable". The **title is still announced**,
+      because focus moved to the container.
+
+### Combobox
+
+- [ ] Focus the field. It announces "combobox" with its label and "collapsed".
+- [ ] Press <kbd>↓</kbd>. It announces "expanded", then the first option **with
+      its position** ("Apple, 1 of 42").
+- [ ] Keep pressing <kbd>↓</kbd>. Each option is announced; **the field never
+      loses focus** and you can still type.
+- [ ] Type `ber`. After a beat, "7 results available" is announced — once, not
+      once per keystroke.
+- [ ] Type `zzz`. "No results available" is announced and the popup does not open.
+- [ ] Press <kbd>Enter</kbd> on a highlighted option. The value is announced in
+      the field.
+- [ ] In the second (slow) combobox, type quickly. The list never flickers back
+      to results for an earlier query.
+
+### Tabs
+
+- [ ] Focus the strip. It announces the tab list's **label**, the selected tab,
+      and its position ("Account settings, Profile, selected, 1 of 3").
+- [ ] <kbd>→</kbd>. The new tab announces as selected.
+- [ ] <kbd>Tab</kbd> once from the strip. Focus goes **into the panel**, not to
+      the next tab.
+- [ ] Select "Billing" (no focusable content) and <kbd>Tab</kbd>. The panel
+      itself takes focus and its content is read.
+- [ ] In the manual-activation example, <kbd>→</kbd> announces the tab but the
+      panel does **not** change until <kbd>Enter</kbd>.
+
+### Disclosure and accordion
+
+- [ ] Each trigger announces "collapsed" / "expanded".
+- [ ] <kbd>VO</kbd> + <kbd>U</kbd> → Headings. **Every accordion section is
+      listed**, at the right level. This is the check the pattern exists for.
+- [ ] Collapsed panel content does not appear when moving with <kbd>VO</kbd> +
+      <kbd>→</kbd>.
+- [ ] In the single-select example, the open section's button announces as
+      "dimmed" but is **still reachable** with <kbd>Tab</kbd>.
+
+### Sortable table
+
+- [ ] Enter the table. The **caption** is announced as its name, with the row and
+      column count.
+- [ ] <kbd>VO</kbd> + <kbd>→</kbd> across a row. Each cell is read **with its
+      column header**, and the row header identifies the row.
+- [ ] Focus a header button. It announces the column name and its sort state.
+- [ ] Sort. "Table sorted by Title, ascending" is announced — **without** the
+      arrow glyph.
+- [ ] Sort by Files, then reverse. The row with no file count stays at the bottom
+      both times.
+
+### Toasts
+
+- [ ] Trigger a polite toast while VoiceOver is reading something else. It
+      **waits its turn**.
+- [ ] Trigger the error. It **interrupts**.
+- [ ] Press "Same message twice". Both are announced, despite identical text.
+- [ ] Trigger three toasts. Each is announced **once** — the earlier ones are not
+      re-read.
+- [ ] <kbd>VO</kbd> + <kbd>U</kbd> → Landmarks. "Notifications" is listed and can
+      be jumped to.
+- [ ] <kbd>Tab</kbd> into a toast. The countdown stops; it does not vanish
+      under you.
+- [ ] Dismiss the focused toast. Focus lands on the remaining toast, not on the
+      top of the page.
+
+Also worth running: **Safari with VoiceOver** and **Chrome with VoiceOver**
+behave differently, particularly for live regions. If you only test one pair,
+test Safari — it is the pair most VoiceOver users are on.
+
+---
+
+## Browser and OS behaviour
+
+- **`prefers-reduced-motion`** — animation is reduced to a hair, not removed;
+  opacity transitions stay so state changes are still perceivable. Toasts read
+  the preference in JS as well as CSS.
+- **`forced-colors` (Windows High Contrast)** — the OS replaces author colors, so
+  anything that carried meaning through color alone disappears. Focus rings,
+  sort state, selected tabs and the combobox highlight are restated with system
+  color keywords.
+- **Focus indicator** — `:focus-visible`, never `:focus`, so a mouse click leaves
+  no ring but every keyboard and switch user always sees one. 3 px outline with a
+  2 px offset, which satisfies WCAG 2.2 Focus Appearance (2.4.11) on both light
+  and dark surfaces.
+- **Target size** — interactive controls are at least 24 × 24 CSS px (WCAG 2.5.8).
+- **Dark theme** — `data-theme="dark"` on `<html>`, defaulting to
+  `prefers-color-scheme`.
+
+---
+
+## Limitations
+
+Deliberately not implemented, rather than half-implemented:
+
+- **Combobox `aria-autocomplete="both"`** (inline completion). It needs text-range
+  selection handling that behaves differently across engines and interacts badly
+  with IME composition.
+- **Deletable tabs** (<kbd>Delete</kbd> on a tab), and tab overflow scrolling.
+- **Multi-select listbox** in the combobox.
+- **Column-header sorting for tables with `colspan`/`rowspan` headers.** Those
+  need `headers`/`id` association rather than `scope`, which is a different
+  pattern.
+- **Shadow DOM.** `getActiveElement()` pierces open shadow roots, but the focus
+  trap's tab cycle does not — `querySelectorAll` does not cross the boundary.
+- **A polyfill for `inert`.** There is a documented fallback to `aria-hidden`
+  when the property is absent, which covers the accessibility tree but not the
+  tab order. Every browser released since mid-2022 supports `inert` natively.
+
+[apg]: https://www.w3.org/WAI/ARIA/apg/

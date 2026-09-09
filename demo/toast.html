@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Toast notifications — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">Live regions</p>
+      <h1>Toast notifications</h1>
+      <p class="lede">
+        There is no APG pattern for this, which is part of why it is the one
+        people get wrong most often.
+      </p>
+
+      <div class="demo-surface">
+        <p style="margin-top:0">
+          <button type="button" class="btn btn--ghost" data-toast="info">Info (polite)</button>
+          <button type="button" class="btn btn--ghost" data-toast="success">Success (polite)</button>
+          <button type="button" class="btn btn--ghost" data-toast="warning">Warning (polite)</button>
+          <button type="button" class="btn btn--ghost" data-toast="error">Error (assertive)</button>
+        </p>
+        <p style="margin-bottom:0">
+          <button type="button" class="btn btn--ghost" data-toast="action">With an undo action</button>
+          <button type="button" class="btn btn--ghost" data-toast="repeat">Same message twice</button>
+        </p>
+      </div>
+
+      <div class="note">
+        <strong>What to check.</strong> With VoiceOver on, trigger a polite toast
+        while it is reading something else — it should wait its turn. Trigger the
+        error and it should interrupt. Press "Same message twice": both are
+        announced, even though the text is identical. Hover a toast and it stops
+        counting down.
+      </div>
+
+      <h2 class="sub">The five failures</h2>
+      <ol>
+        <li>
+          <strong>Announcing by inserting the live region itself.</strong>
+          Creating a <code>&lt;div role="alert"&gt;</code> and putting text in it
+          in the same task usually announces nothing — assistive technology
+          reacts to mutations <em>inside</em> a region it is already observing.
+          Both regions here are created empty at page load.
+        </li>
+        <li>
+          <strong>Making the visible stack the live region.</strong> The stack
+          mutates constantly: enter animations, dismiss buttons, timers removing
+          nodes. Worse, <code>role="alert"</code> implies
+          <code>aria-atomic="true"</code>, so a second toast re-announces the
+          first one too. Here the stack is a plain labelled landmark, and
+          announcements are mirrored into separate single-message regions.
+        </li>
+        <li>
+          <strong><code>assertive</code> for everything.</strong> It interrupts
+          the user mid-sentence — including mid-sentence in the thing they were
+          reading to decide what to do. Only errors use it.
+        </li>
+        <li>
+          <strong>Auto-dismiss that cannot be paused</strong> (WCAG 2.2.1) or
+          that is too short to read. Timers pause on hover <em>and</em> on focus,
+          resume with only the time that was left, and errors never expire.
+        </li>
+        <li>
+          <strong>Focus vanishing.</strong> If a toast is removed while the user
+          is tabbed into it, focus falls back to <code>&lt;body&gt;</code> and the
+          screen reader jumps to the top of the page. Focus is moved deliberately
+          before the node is removed.
+        </li>
+      </ol>
+
+          <table class="keys">
+            <caption>Keyboard interaction</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Reach the toast's action and dismiss buttons. Focusing anything in the stack pauses every timer.</td></tr>
+            <tr><th scope="row"><kbd>Enter or Space</kbd></th><td>Activate the focused action or dismiss button.</td></tr>
+            </tbody>
+          </table>
+      <p>
+        The stack is a labelled <code>region</code> landmark, so a screen reader
+        user can jump to it with the rotor and review notifications at their own
+        pace rather than chasing them before they expire.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { toasts } = await import('../src/components/toast/toast.js');
+    const notify = toasts();
+
+    const messages = {
+      info: () => notify.info('Your export is being prepared.'),
+      success: () => notify.success('Workspace renamed to Northwind.'),
+      warning: () => notify.warning('Two of nine files were skipped.'),
+      error: () => notify.error('Upload failed: the connection was reset.'),
+      action: () => notify.success('Message archived.', {
+        action: { label: 'Undo', onClick: () => notify.info('Message restored.') },
+      }),
+      repeat: () => {
+        notify.info('Copied to clipboard.');
+        setTimeout(() => notify.info('Copied to clipboard.'), 1200);
+      },
+    };
+
+    for (const button of document.querySelectorAll('[data-toast]')) {
+      button.addEventListener('click', () => messages[button.dataset.toast]());
+    }
+  </script>
+</body>
+</html>
