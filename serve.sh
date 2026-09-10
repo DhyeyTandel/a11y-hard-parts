@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 # ES modules need an http origin; file:// blocks them with a CORS error.
-cd "$(dirname "$0")" && python3 -m http.server "${1:-8080}"
+cd "$(dirname "$0")" && exec python3 serve.py "${1:-8080}"

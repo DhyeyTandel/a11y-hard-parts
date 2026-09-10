@@ -1,0 +1,69 @@
+.a11y-menu { position: relative; display: inline-block; }
+
+.a11y-menu__list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  background: var(--card);
+  border: 1px solid var(--faint);
+  border-radius: var(--r-input);
+  box-shadow: var(--shadow-halo);
+}
+.a11y-menu__list[hidden] { display: none; }
+
+.a11y-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  color: var(--body-color);
+  background: none;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Menu items take real DOM focus, so :focus is the right hook here — unlike
+   the combobox, where the highlight is driven by aria-activedescendant. */
+.a11y-menu__item:hover,
+.a11y-menu__item:focus {
+  background: var(--accent-soft);
+  color: var(--ink);
+  outline: none;
+}
+.a11y-menu__item:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: -3px;
+}
+
+.a11y-menu__item[aria-disabled="true"] { color: var(--muted-soft); cursor: default; }
+
+/* The tick is drawn from aria-checked, so the visual state cannot drift from
+   the announced state. */
+.a11y-menu__item[role="menuitemcheckbox"]::before,
+.a11y-menu__item[role="menuitemradio"]::before {
+  content: "";
+  width: 14px;
+  flex: none;
+  color: var(--accent);
+}
+.a11y-menu__item[aria-checked="true"]::before { content: "✓"; }
+
+.a11y-menu__separator {
+  height: 1px;
+  margin: 5px 8px;
+  background: var(--faint);
+}
+
+@media (forced-colors: active) {
+  .a11y-menu__item:focus { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+}

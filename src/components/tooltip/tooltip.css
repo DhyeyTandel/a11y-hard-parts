@@ -1,0 +1,42 @@
+.a11y-tooltip { position: relative; display: inline-block; }
+
+.a11y-tooltip__content {
+  position: absolute;
+  z-index: 40;
+  left: 50%;
+  width: max-content;
+  max-width: 260px;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--on-ink);
+  background: var(--ink-surface);
+  border-radius: var(--r-input);
+  box-shadow: var(--shadow-halo);
+  transform: translateX(-50%);
+}
+.a11y-tooltip__content[hidden] { display: none; }
+
+.a11y-tooltip__content[data-placement="top"] { bottom: calc(100% + 8px); }
+.a11y-tooltip__content[data-placement="bottom"] { top: calc(100% + 8px); }
+
+/*
+ * The gap between trigger and tooltip is bridged by a transparent pad, so the
+ * pointer never crosses "nothing" on its way to the tooltip. Together with the
+ * hide grace period in JS, this is what satisfies the "hoverable" half of
+ * WCAG 1.4.13 — a tooltip you cannot reach with the pointer is one a
+ * magnifier user cannot read.
+ */
+.a11y-tooltip__content::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+.a11y-tooltip__content[data-placement="top"]::after { top: 100%; }
+.a11y-tooltip__content[data-placement="bottom"]::after { bottom: 100%; }
+
+@media (forced-colors: active) {
+  .a11y-tooltip__content { border: 1px solid CanvasText; }
+}

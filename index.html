@@ -19,9 +19,13 @@
         <a href="index.html">Overview</a>
         <a href="demo/dialog.html">Dialog</a>
         <a href="demo/combobox.html">Combobox</a>
+        <a href="demo/listbox.html">Listbox</a>
+        <a href="demo/menu.html">Menu</a>
         <a href="demo/tabs.html">Tabs</a>
         <a href="demo/disclosure.html">Disclosure</a>
         <a href="demo/table.html">Table</a>
+        <a href="demo/slider.html">Slider</a>
+        <a href="demo/tooltip.html">Tooltip</a>
         <a href="demo/toast.html">Toasts</a>
       <button type="button" class="theme-toggle">Dark</button>
     </nav>
@@ -34,8 +38,9 @@
       <p class="lede">
         Not buttons and cards. A focus trap that cannot be escaped, a combobox
         that keeps DOM focus in the input, a live region that actually
-        announces. Zero dependencies, no build step, 1,400 lines of plain
-        ES modules — and 600 lines of comments explaining why.
+        announces. Eleven patterns, zero dependencies, no build step — plain
+        ES modules, and about a third of the source is comments explaining
+        why each decision is what it is.
       </p>
 
       <ul class="card-grid">
@@ -62,6 +67,26 @@
         <li><a class="card" href="demo/table.html">
           <h2>Sortable table</h2>
           <p><code>aria-sort</code> on one header, <code>scope</code>, caption, announced order.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/listbox.html">
+          <h2>Listbox</h2>
+          <p>Single and multi-select, type-ahead, selection independent of focus.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/menu.html">
+          <h2>Menu button</h2>
+          <p>Roving focus, cycling type-ahead, checkbox and radio items.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/slider.html">
+          <h2>Slider</h2>
+          <p><code>aria-valuetext</code>, and range bounds that move with the other thumb.</p>
+          <span class="go">Open demo →</span>
+        </a></li>
+        <li><a class="card" href="demo/tooltip.html">
+          <h2>Tooltip</h2>
+          <p>WCAG 1.4.13: dismissible, hoverable, persistent.</p>
           <span class="go">Open demo →</span>
         </a></li>
         <li><a class="card" href="demo/toast.html">
@@ -92,7 +117,7 @@
 
       <h2>Verification</h2>
       <p>
-        113 automated assertions run in a real browser — real focus order, real
+        187 automated assertions run in a real browser — real focus order, real
         <code>inert</code>, real layout — because jsdom implements none of
         those. Announcements are a separate matter: no automated tool can hear
         VoiceOver, so each component ships a manual test script in the README.
