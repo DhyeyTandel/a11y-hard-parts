@@ -1,0 +1,55 @@
+.a11y-slider { display: grid; gap: 10px; max-width: 420px; padding-bottom: 4px; }
+
+.a11y-slider__label { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); }
+.a11y-slider__value { font-family: var(--font-mono); font-size: 13px; color: var(--ink); }
+
+.a11y-slider__track {
+  position: relative;
+  height: 6px;
+  margin: 12px 11px;
+  background: var(--faint);
+  border-radius: var(--r-pill);
+  /* Without this, a drag on a touch screen scrolls the page instead of moving
+     the thumb. */
+  touch-action: none;
+}
+
+.a11y-slider__track::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--slider-fill-start, 0%);
+  right: calc(100% - var(--slider-fill-end, 0%));
+  background: var(--accent);
+  border-radius: var(--r-pill);
+}
+
+.a11y-slider__thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--slider-position, 0%);
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  box-shadow: var(--shadow-soft);
+  cursor: grab;
+  touch-action: none;
+}
+.a11y-slider__thumb:active { cursor: grabbing; transform: scale(1.1); }
+
+.a11y-slider__thumb:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 3px;
+}
+
+.a11y-slider--vertical .a11y-slider__track { width: 6px; height: 180px; margin: 11px auto; }
+.a11y-slider--vertical .a11y-slider__thumb { top: auto; left: 50%; bottom: var(--slider-position, 0%); margin: 0 0 -11px -11px; }
+
+@media (forced-colors: active) {
+  .a11y-slider__track::before { forced-color-adjust: none; background: Highlight; }
+  .a11y-slider__thumb { forced-color-adjust: none; background: ButtonFace; border-color: ButtonText; }
+}

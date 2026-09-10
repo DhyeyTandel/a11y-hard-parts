@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Slider — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/listbox.html">Listbox</a>
+        <a href="../demo/menu.html">Menu</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/slider.html">Slider</a>
+        <a href="../demo/tooltip.html">Tooltip</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">APG · Slider and Multi-Thumb Slider</p>
+      <h1>Slider</h1>
+      <p class="lede">
+        <code>aria-valuenow="3"</code> announces "3". Three what? The attribute
+        people leave out is <code>aria-valuetext</code>, and it is the one that
+        decides whether the control is usable.
+      </p>
+
+      <div class="demo-surface">
+        <div class="a11y-slider" data-a11y-slider id="volume" data-min="0" data-max="100" data-step="5">
+          <span class="a11y-slider__label">
+            <label id="vol-label">Volume</label>
+            <output class="a11y-slider__value" id="vol-out">40%</output>
+          </span>
+          <div class="a11y-slider__track" data-a11y-slider-track>
+            <div class="a11y-slider__thumb" data-a11y-slider-thumb data-value="40" aria-labelledby="vol-label"></div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sub">Named steps, where the number means nothing on its own</h2>
+      <div class="demo-surface">
+        <div class="a11y-slider" data-a11y-slider id="speed" data-min="0" data-max="3" data-step="1">
+          <span class="a11y-slider__label">
+            <label id="speed-label">Delivery speed</label>
+            <output class="a11y-slider__value" id="speed-out">Standard</output>
+          </span>
+          <div class="a11y-slider__track" data-a11y-slider-track>
+            <div class="a11y-slider__thumb" data-a11y-slider-thumb data-value="1" aria-labelledby="speed-label"></div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sub">Two thumbs</h2>
+      <div class="demo-surface">
+        <div class="a11y-slider" data-a11y-slider id="price" data-min="0" data-max="1000" data-step="10">
+          <span class="a11y-slider__label">
+            <span>Price range</span>
+            <output class="a11y-slider__value" id="price-out">£200 – £800</output>
+          </span>
+          <div class="a11y-slider__track" data-a11y-slider-track>
+            <div class="a11y-slider__thumb" data-a11y-slider-thumb data-value="200" aria-label="Minimum price"></div>
+            <div class="a11y-slider__thumb" data-a11y-slider-thumb data-value="800" aria-label="Maximum price"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>What to check.</strong> On the price slider, move the maximum
+        thumb down and then focus the minimum thumb: its announced upper bound
+        has moved with it. A screen reader that still promises "0 to 1000" is
+        describing a range the thumb cannot reach. Each thumb also has its own
+        name — two thumbs both called "Price" are indistinguishable.
+      </div>
+
+          <table class="keys">
+            <caption>Keyboard interaction</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>→ / ↑</kbd></th><td>Increase by one step.</td></tr>
+            <tr><th scope="row"><kbd>← / ↓</kbd></th><td>Decrease by one step.</td></tr>
+            <tr><th scope="row"><kbd>Page Up / Page Down</kbd></th><td>Increase / decrease by the large step — a tenth of the range by default.</td></tr>
+            <tr><th scope="row"><kbd>Home / End</kbd></th><td>Jump to the minimum / maximum.</td></tr>
+            </tbody>
+          </table>
+      <h2 class="sub">Notes</h2>
+      <p>
+        In a right-to-left writing mode the arrows follow the visual direction of
+        the track, not the numeric axis — <kbd>←</kbd> increases. Getting this
+        backwards makes the control feel broken to every RTL user.
+      </p>
+      <p>
+        The track carries <code>touch-action: none</code>. Without it, dragging a
+        thumb on a touch screen scrolls the page instead.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { Slider } = await import('../src/components/slider/slider.js');
+
+    const volOut = document.getElementById('vol-out');
+    new Slider(document.getElementById('volume'), {
+      format: (v) => `${v} percent`,
+      onChange: ([v]) => { volOut.textContent = `${v}%`; },
+    });
+
+    const SPEEDS = ['Economy', 'Standard', 'Express', 'Next day'];
+    const speedOut = document.getElementById('speed-out');
+    new Slider(document.getElementById('speed'), {
+      // Without this the screen reader says "2". With it, "Express".
+      format: (v) => SPEEDS[v],
+      onChange: ([v]) => { speedOut.textContent = SPEEDS[v]; },
+    });
+
+    const priceOut = document.getElementById('price-out');
+    new Slider(document.getElementById('price'), {
+      format: (v) => `${v} pounds`,
+      onChange: ([min, max]) => { priceOut.textContent = `£${min} – £${max}`; },
+    });
+  </script>
+</body>
+</html>

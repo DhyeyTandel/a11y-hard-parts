@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tooltip — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/listbox.html">Listbox</a>
+        <a href="../demo/menu.html">Menu</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/slider.html">Slider</a>
+        <a href="../demo/tooltip.html">Tooltip</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">WCAG 2.1 · SC 1.4.13</p>
+      <h1>Tooltip</h1>
+      <p class="lede">
+        Like toasts, there is no APG pattern — and like toasts, almost every
+        implementation fails the same three requirements.
+      </p>
+
+      <div class="demo-surface">
+        <p style="margin-top:0">
+          <span class="a11y-tooltip" data-a11y-tooltip>
+            <button type="button" class="btn btn--ghost" data-a11y-tooltip-trigger>Save</button>
+            <span class="a11y-tooltip__content" data-a11y-tooltip-content>Saves a copy to your drafts. Nothing is published.</span>
+          </span>
+
+          <span class="a11y-tooltip" data-a11y-tooltip style="margin-left:8px">
+            <button type="button" class="btn btn--ghost" data-a11y-tooltip-trigger>Archive</button>
+            <span class="a11y-tooltip__content" data-a11y-tooltip-content>Hidden from the list, kept for 30 days, then permanently deleted.</span>
+          </span>
+
+          <span class="a11y-tooltip" data-a11y-tooltip data-a11y-tooltip-relationship="labels" style="margin-left:8px">
+            <button type="button" class="btn btn--ghost" data-a11y-tooltip-trigger><span aria-hidden="true">↗</span></button>
+            <span class="a11y-tooltip__content" data-a11y-tooltip-content>Open in a new tab</span>
+          </span>
+        </p>
+        <p style="margin-bottom:0;font-size:14px;color:var(--muted)">
+          The third button is icon-only, so its tooltip <em>names</em> it
+          (<code>aria-labelledby</code>) rather than describing it. The first two
+          already have names, so theirs describe (<code>aria-describedby</code>).
+        </p>
+      </div>
+
+      <div class="note">
+        <strong>What to check.</strong> Hover a tooltip, then move the pointer
+        <em>onto the tooltip itself</em> — it stays. Press <kbd>Esc</kbd> while
+        hovering — it disappears without the pointer or focus moving. Tab to a
+        button and the tooltip appears immediately, with no hover delay.
+      </div>
+
+      <h2 class="sub">The three requirements</h2>
+      <ol>
+        <li>
+          <strong>Dismissible.</strong> <kbd>Esc</kbd> hides it without moving
+          the pointer or focus. A tooltip that can only be dismissed by moving
+          away can permanently obscure the content underneath for a
+          screen-magnifier user, who may be looking at a 4× zoom of the exact
+          region the tooltip is covering.
+        </li>
+        <li>
+          <strong>Hoverable.</strong> The pointer can travel onto the tooltip and
+          it stays. Hiding on <code>mouseleave</code> with no grace period fails
+          this: the tooltip vanishes as the pointer crosses the gap, so a
+          magnifier user can never read a tooltip longer than their viewport.
+        </li>
+        <li>
+          <strong>Persistent.</strong> It stays until dismissed, until hover and
+          focus are both gone, or until it stops being valid. No auto-hide timer.
+        </li>
+      </ol>
+
+      <h2 class="sub">Two more that are not in 1.4.13</h2>
+      <p>
+        <strong>Never the <code>title</code> attribute.</strong> It cannot be
+        styled, it appears after an uncontrollable delay, screen readers treat it
+        inconsistently, and on touch it does not appear at all.
+      </p>
+      <p>
+        <strong>Never anything interactive inside.</strong> A tooltip is not
+        focusable, so a link or button in one is unreachable by keyboard. If it
+        needs interaction, it is a popover or a dialog — not a tooltip.
+      </p>
+
+          <table class="keys">
+            <caption>Keyboard interaction</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Focus the trigger. The tooltip appears immediately, with no delay.</td></tr>
+            <tr><th scope="row"><kbd>Esc</kbd></th><td>Dismiss, without moving the pointer or focus.</td></tr>
+            </tbody>
+          </table>
+      <p>
+        Tooltips do not exist on touch — there is no hover. Anything essential
+        must be somewhere else as well.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { initTooltips } = await import('../src/components/tooltip/tooltip.js');
+    initTooltips();
+  </script>
+</body>
+</html>

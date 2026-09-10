@@ -187,6 +187,26 @@ export const nextFrame = () =>
 export const frames = async (count = 3) => { for (let i = 0; i < count; i += 1) await nextFrame(); };
 export const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * Poll until `predicate` is true, or fail.
+ *
+ * For "this should eventually happen" assertions, this beats a fixed sleep:
+ * a backgrounded tab clamps timers to roughly one per second, so a component
+ * timer set for 0 ms and a test's `wait(40)` both land at ~1000 ms and race
+ * each other. Polling asserts the outcome instead of the schedule.
+ *
+ * Its opposite — "this should NOT happen" — still needs a real wait, long
+ * enough to outlast the timer being tested. A poll cannot prove a negative.
+ */
+export async function until(predicate, message = 'Condition was never met', timeout = 5000) {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    if (predicate()) return;
+    await wait(20);
+  }
+  throw new Error(`${message} (waited ${timeout}ms)`);
+}
+
 // ---- runner -------------------------------------------------------------
 
 export async function run() {

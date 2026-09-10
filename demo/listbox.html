@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Listbox — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/listbox.html">Listbox</a>
+        <a href="../demo/menu.html">Menu</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/slider.html">Slider</a>
+        <a href="../demo/tooltip.html">Tooltip</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">APG · Listbox</p>
+      <h1>Listbox</h1>
+      <p class="lede">
+        The list is the tab stop; the options never are. The highlight is
+        carried by <code>aria-activedescendant</code>, which keeps selection and
+        focus independent — exactly what multi-select needs.
+      </p>
+
+      <h2 class="sub">Single select — selection follows focus</h2>
+      <p>The default. Arrowing changes the value, which is what a keyboard user expects from a list of choices.</p>
+      <div class="demo-surface">
+        <div class="a11y-listbox" data-a11y-listbox id="city-listbox">
+          <span class="a11y-listbox__label" id="city-label">Time zone</span>
+          <ul class="a11y-listbox__list" data-a11y-listbox-list aria-labelledby="city-label">
+            <li class="a11y-listbox__option" data-a11y-listbox-option aria-selected="true">Amsterdam</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Athens</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Berlin</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Copenhagen</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Dublin</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Helsinki</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Lisbon</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Madrid</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 class="sub">Single select — selection does not follow focus</h2>
+      <p>
+        Use this when selecting has a side effect: a network request, a
+        destructive change, anything you would not want fired eight times while
+        someone arrows down the list.
+      </p>
+      <div class="demo-surface">
+        <div class="a11y-listbox" data-a11y-listbox data-a11y-listbox-follow-focus="false">
+          <span class="a11y-listbox__label" id="env-label">Deploy to (confirm with Enter)</span>
+          <ul class="a11y-listbox__list" data-a11y-listbox-list aria-labelledby="env-label">
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Development</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Staging</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Production</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 class="sub">Multi select</h2>
+      <div class="demo-surface">
+        <div class="a11y-listbox" data-a11y-listbox data-a11y-listbox-multiple="true" id="tags-listbox">
+          <span class="a11y-listbox__label" id="tags-label">Labels</span>
+          <ul class="a11y-listbox__list" data-a11y-listbox-list aria-labelledby="tags-label">
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Accessibility</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Bug</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Documentation</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Enhancement</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Performance</li>
+            <li class="a11y-listbox__option" data-a11y-listbox-option>Regression</li>
+          </ul>
+        </div>
+        <p style="margin:20px 0 0;font-size:15px;color:var(--muted)">
+          Selected: <strong id="tags-output" style="color:var(--ink)">nothing</strong>
+        </p>
+      </div>
+
+      <div class="note">
+        <strong>What to check.</strong> In the multi-select list, arrow down and
+        watch: the dashed highlight moves but the ticks do not follow. Those are
+        two independent states, and a design that draws them the same way makes
+        multi-select impossible to follow. <kbd>Ctrl</kbd>+<kbd>A</kbd> selects
+        all — and a second press clears, because a select-all with no way back
+        is a trap.
+      </div>
+
+          <table class="keys">
+            <caption>Keyboard interaction</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Into the list — one stop, however many options it holds.</td></tr>
+            <tr><th scope="row"><kbd>↓ / ↑</kbd></th><td>Move the highlight. Clamps at the ends; a listbox does not wrap.</td></tr>
+            <tr><th scope="row"><kbd>Home / End</kbd></th><td>First / last option.</td></tr>
+            <tr><th scope="row"><kbd>Space</kbd></th><td>Single select: choose the highlighted option. Multi select: toggle it.</td></tr>
+            <tr><th scope="row"><kbd>Enter</kbd></th><td>Choose the highlighted option when selection does not follow focus.</td></tr>
+            <tr><th scope="row"><kbd>Shift + ↓ / ↑</kbd></th><td>Multi select: extend the selection as the highlight moves.</td></tr>
+            <tr><th scope="row"><kbd>Ctrl/⌘ + A</kbd></th><td>Multi select: select all. Press again to clear.</td></tr>
+            <tr><th scope="row"><kbd>Printable character</kbd></th><td>Jump to the next option starting with it, cycling on repeats.</td></tr>
+            </tbody>
+          </table>
+      <h2 class="sub">Notes</h2>
+      <p>
+        In a multi-select listbox every option carries an explicit
+        <code>aria-selected</code>, so "not selected" is stated rather than
+        inferred. In a single-select one, only the chosen option has the
+        attribute — an option without it is simply not the current value.
+      </p>
+      <p>
+        <kbd>Space</kbd> is always consumed. A focusable list that lets
+        <kbd>Space</kbd> through scrolls the page, moving the list out from
+        under the user mid-selection.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { initListboxes } = await import('../src/components/listbox/listbox.js');
+    const output = document.getElementById('tags-output');
+    document.getElementById('tags-listbox').addEventListener('a11y-listbox:change', (event) => {
+      const value = event.detail.value;
+      output.textContent = value.length ? value.join(', ') : 'nothing';
+    });
+    initListboxes();
+  </script>
+</body>
+</html>

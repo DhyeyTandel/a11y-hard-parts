@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Menu button — accessible components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Sofia+Sans:wght@400..700&display=swap">
+  <link rel="stylesheet" href="../src/styles/index.css">
+  <link rel="stylesheet" href="../demo/demo.css">
+</head>
+<body class="a11y-scope">
+  <a class="skip-link a11y-visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <header class="site-header wrap">
+    <a class="wordmark" href="../index.html">Accessible components</a>
+    <nav class="site-nav" aria-label="Components">
+        <a href="../index.html">Overview</a>
+        <a href="../demo/dialog.html">Dialog</a>
+        <a href="../demo/combobox.html">Combobox</a>
+        <a href="../demo/listbox.html">Listbox</a>
+        <a href="../demo/menu.html">Menu</a>
+        <a href="../demo/tabs.html">Tabs</a>
+        <a href="../demo/disclosure.html">Disclosure</a>
+        <a href="../demo/table.html">Table</a>
+        <a href="../demo/slider.html">Slider</a>
+        <a href="../demo/tooltip.html">Tooltip</a>
+        <a href="../demo/toast.html">Toasts</a>
+      <button type="button" class="theme-toggle">Dark</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="block wrap narrow">
+      <p class="eyebrow">APG · Menu Button</p>
+      <h1>Menu button</h1>
+      <p class="lede">
+        Real focus moves into the menu here — the opposite of the combobox,
+        where focus stays in the input. There is no text field to keep it in.
+      </p>
+
+      <div class="demo-surface">
+        <div class="a11y-menu" data-a11y-menu>
+          <button type="button" class="btn btn--ghost" data-a11y-menu-trigger>Actions ▾</button>
+          <ul class="a11y-menu__list" data-a11y-menu-list>
+            <li><button type="button" class="a11y-menu__item" data-a11y-menu-item>Rename</button></li>
+            <li><button type="button" class="a11y-menu__item" data-a11y-menu-item>Duplicate</button></li>
+            <li><button type="button" class="a11y-menu__item" data-a11y-menu-item aria-disabled="true">Move to…</button></li>
+            <li role="separator" class="a11y-menu__separator"></li>
+            <li><button type="button" class="a11y-menu__item" data-a11y-menu-item>Delete</button></li>
+          </ul>
+        </div>
+
+        <div class="a11y-menu" data-a11y-menu style="margin-left:12px">
+          <button type="button" class="btn btn--ghost" data-a11y-menu-trigger>View ▾</button>
+          <ul class="a11y-menu__list" data-a11y-menu-list>
+            <li><button type="button" class="a11y-menu__item" data-a11y-menu-item data-a11y-menu-checkbox>Show hidden files</button></li>
+            <li><button type="button" class="a11y-menu__item" data-a11y-menu-item data-a11y-menu-checkbox aria-checked="true">Show file sizes</button></li>
+            <li role="separator" class="a11y-menu__separator"></li>
+            <li role="group" aria-label="Sort by" style="list-style:none;padding:0;margin:0">
+              <button type="button" class="a11y-menu__item" data-a11y-menu-item data-a11y-menu-radio aria-checked="true">Name</button>
+              <button type="button" class="a11y-menu__item" data-a11y-menu-item data-a11y-menu-radio>Date modified</button>
+              <button type="button" class="a11y-menu__item" data-a11y-menu-item data-a11y-menu-radio>Size</button>
+            </li>
+          </ul>
+        </div>
+
+        <p style="margin:28px 0 0;font-size:15px;color:var(--muted)">
+          Last action: <strong id="menu-output" style="color:var(--ink)">none yet</strong>
+        </p>
+      </div>
+
+      <div class="note">
+        <strong>What to check.</strong> Type <kbd>d</kbd> repeatedly in the first
+        menu — it cycles Duplicate → Delete → Duplicate, rather than searching
+        for "dd". Checkbox items keep the menu open so several can be set in one
+        visit; everything else closes and returns focus to the button.
+      </div>
+
+          <table class="keys">
+            <caption>Keyboard interaction — trigger</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>Enter, Space or ↓</kbd></th><td>Open the menu and focus the first item.</td></tr>
+            <tr><th scope="row"><kbd>↑</kbd></th><td>Open the menu and focus the last item.</td></tr>
+            </tbody>
+          </table>
+          <table class="keys">
+            <caption>Keyboard interaction — open menu</caption>
+            <tbody>
+            <tr><th scope="row"><kbd>↓ / ↑</kbd></th><td>Next / previous item, wrapping at both ends. Disabled items are stepped over.</td></tr>
+            <tr><th scope="row"><kbd>Home / End</kbd></th><td>First / last item.</td></tr>
+            <tr><th scope="row"><kbd>Enter or Space</kbd></th><td>Activate the focused item.</td></tr>
+            <tr><th scope="row"><kbd>Esc</kbd></th><td>Close and return focus to the button.</td></tr>
+            <tr><th scope="row"><kbd>Tab</kbd></th><td>Close the menu and let focus move on — the keystroke is not consumed.</td></tr>
+            <tr><th scope="row"><kbd>Printable character</kbd></th><td>Jump to the next item starting with it. Repeating a character cycles through matches.</td></tr>
+            </tbody>
+          </table>
+      <h2 class="sub">Notes</h2>
+      <p>
+        <strong>Do not use this for site navigation.</strong> A <code>&lt;nav&gt;</code>
+        full of links marked <code>role="menuitem"</code> is the single most
+        common misuse of the role: it strips every link affordance a screen
+        reader user relies on — no "link" announcement, no link list in the
+        rotor, no open-in-new-tab expectation. <code>role="menu"</code> is a
+        promise that this is a list of <em>actions</em> with menu keyboard
+        behaviour. Navigation is a list of links.
+      </p>
+      <p>
+        Checkbox and radio items carry their state in <code>aria-checked</code>,
+        and the tick is drawn from that attribute in CSS — so the visual state
+        cannot drift from the announced state.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Built against the ARIA Authoring Practices Guide.</strong><br>
+        Every pattern here is verified with the keyboard and with VoiceOver, not just with a linter.</p>
+      <p>Dhyey Tandel</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initChrome } from '../demo/demo.js';
+    initChrome();
+    const { initMenus } = await import('../src/components/menu/menu.js');
+    const output = document.getElementById('menu-output');
+    for (const root of document.querySelectorAll('[data-a11y-menu]')) {
+      root.addEventListener('a11y-menu:select', (event) => {
+        output.textContent = event.detail.value;
+      });
+    }
+    initMenus();
+  </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 # Accessible components
 
-Seven components built against the [ARIA Authoring Practices Guide][apg], chosen
-because they are the ones that are genuinely hard to get right — not buttons and
-cards.
+Eleven components built against the [ARIA Authoring Practices Guide][apg] and
+WCAG 2.2, chosen because they are the ones that are genuinely hard to get right
+— not buttons and cards.
 
 Zero dependencies. No build step. Plain ES modules and CSS custom properties.
 
@@ -40,6 +40,10 @@ Then open <http://localhost:8080/> for the demos, or
 | **Accordion** | Real heading structure, and `aria-disabled` rather than `disabled` for a panel that cannot be collapsed |
 | **Sortable table** | `aria-sort` on exactly one header, `scope` on every header, a caption, and an announcement — because re-sorting silently rewrites everything below the reading position |
 | **Toasts** | Live regions that actually announce, politeness that is not always `assertive`, timers that pause, and focus that does not vanish |
+| **Menu button** | Real focus moving into the menu, type-ahead that cycles on a repeated character, `menuitemcheckbox`/`menuitemradio` state, and Escape returning focus |
+| **Listbox** | Selection and focus as independent states, which is what multi-select actually needs; range extension; select-all that can be undone |
+| **Slider** | `aria-valuetext` where the raw number means nothing, per-thumb names, and range bounds that move as the neighbouring thumb moves |
+| **Tooltip** | WCAG 1.4.13 in full: dismissible with Escape, hoverable across the gap, and persistent with no auto-hide |
 
 Every non-obvious decision is explained in a comment next to the code it
 explains, rather than here. If you want the reasoning for a specific behaviour,
@@ -61,6 +65,7 @@ Imperative, for anything that needs configuration:
 ```js
 import { Dialog } from './src/components/dialog/dialog.js';
 import { Combobox } from './src/components/combobox/combobox.js';
+import { Slider } from './src/components/slider/slider.js';
 
 const dialog = new Dialog(document.querySelector('#confirm'), {
   alert: true,
@@ -72,6 +77,11 @@ new Combobox(document.querySelector('#fruit'), {
   source: async (query) => fetch(`/search?q=${query}`).then((r) => r.json()),
   minChars: 2,
   onSelect: (item) => console.log(item),
+});
+
+new Slider(document.querySelector('#speed'), {
+  // Without a formatter this announces "2". With one, "Express".
+  format: (value) => ['Economy', 'Standard', 'Express', 'Next day'][value],
 });
 ```
 
@@ -220,6 +230,121 @@ forty landmarks is noise rather than navigation.
   the direction flip means reversing a sort fills the top of the table with
   blanks.
 
+### Menu button
+
+Real focus moves into the menu — the opposite of the combobox, because there is
+no text field to keep it in.
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>↓</kbd> | On the button: open the menu and focus the first item. |
+| <kbd>↑</kbd> | On the button: open the menu and focus the last item. |
+| <kbd>↓</kbd> / <kbd>↑</kbd> | Next / previous item, wrapping. Disabled items are stepped over, not landed on. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | First / last item. |
+| <kbd>Enter</kbd> or <kbd>Space</kbd> | Activate the focused item. |
+| <kbd>Esc</kbd> | Close and return focus to the button. |
+| <kbd>Tab</kbd> | Close the menu and let focus move on — the keystroke is **not** consumed. |
+| Printable character | Jump to the next item starting with it. A repeated character **cycles** through matches rather than searching for "dd". |
+
+**Do not use `role="menu"` for site navigation.** A `<nav>` full of links marked
+`role="menuitem"` is the single most common misuse of the role: it strips every
+link affordance a screen reader user relies on — no "link" announcement, no link
+list in the rotor, no open-in-new-tab expectation. `role="menu"` promises a list
+of *actions* with menu keyboard behaviour. Navigation is a list of links.
+
+Checkbox items keep the menu open, so several can be set in one visit.
+`aria-checked` drives the tick in CSS, so the visual and announced states cannot
+drift apart.
+
+### Listbox
+
+The list is the tab stop; the options never are. The highlight is carried by
+`aria-activedescendant`.
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Tab</kbd> | Into the list — one stop, however many options it holds. |
+| <kbd>↓</kbd> / <kbd>↑</kbd> | Move the highlight. **Clamps** at the ends; a listbox does not wrap. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | First / last option. |
+| <kbd>Space</kbd> | Single-select: choose the highlighted option. Multi-select: toggle it. Always consumed, or the page scrolls out from under the user. |
+| <kbd>Enter</kbd> | Choose the highlighted option when selection does not follow focus. |
+| <kbd>Shift</kbd> + <kbd>↓</kbd> / <kbd>↑</kbd> | Multi-select: extend the selection as the highlight moves. |
+| <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>A</kbd> | Multi-select: select all. Press again to clear — a select-all with no way back is a trap. |
+| Printable character | Jump to the next option starting with it, cycling on repeats. |
+
+**Single-select**: selection follows focus by default, which is what a keyboard
+user expects from a list of choices. Turn it off (`followFocus: false`) when
+selecting has a side effect — a network request, a destructive change — and
+require <kbd>Enter</kbd> instead.
+
+**Multi-select**: focus and selection are separate states, and the design must
+draw them differently. Arrowing moves the highlight without changing the ticks;
+if both look the same, multi-select is impossible to follow.
+
+Every option in a multi-select listbox carries an explicit `aria-selected`, so
+"not selected" is stated rather than inferred. In a single-select one, only the
+chosen option has it.
+
+### Slider
+
+| Key | Behaviour |
+|---|---|
+| <kbd>→</kbd> / <kbd>↑</kbd> | Increase by one step. |
+| <kbd>←</kbd> / <kbd>↓</kbd> | Decrease by one step. |
+| <kbd>Page Up</kbd> / <kbd>Page Down</kbd> | Large step — a tenth of the range by default. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the minimum / maximum. |
+
+Three things that decide whether a slider is usable:
+
+1. **`aria-valuetext` whenever the raw number is not self-describing.**
+   `aria-valuenow="3"` announces "3" — three what? With
+   `aria-valuetext="Next day"` it announces something a person can act on. Use
+   it for currency, dates, named steps and ratios.
+2. **A name per thumb on a range slider.** Two thumbs both called "Price" are
+   indistinguishable; they need "Minimum price" and "Maximum price".
+3. **Bounds that move.** Each thumb's range is bounded by its neighbour, so
+   `aria-valuemin`/`aria-valuemax` must move as the other thumb moves —
+   otherwise the screen reader promises a range the thumb cannot reach.
+
+In a right-to-left writing mode the arrows follow the **visual** direction of the
+track, so <kbd>←</kbd> increases. Getting this backwards makes the control feel
+broken to every RTL user. The track carries `touch-action: none`, without which
+dragging a thumb on a touch screen scrolls the page instead.
+
+### Tooltip
+
+| Key | Behaviour |
+|---|---|
+| <kbd>Tab</kbd> | Focus the trigger. The tooltip appears **immediately** — a keyboard user has already committed, so there is no hover delay to serve. |
+| <kbd>Esc</kbd> | Dismiss, without moving the pointer or focus. |
+
+WCAG 2.1 SC 1.4.13 requires content shown on hover or focus to be:
+
+1. **Dismissible** — <kbd>Esc</kbd> hides it *without moving the pointer or
+   focus*. A tooltip that can only be dismissed by moving away can permanently
+   obscure the content underneath for a screen-magnifier user, who may be
+   looking at a 4× zoom of the exact region it covers.
+2. **Hoverable** — the pointer can travel onto the tooltip and it stays. Hiding
+   on `mouseleave` with no grace period fails this: it vanishes as the pointer
+   crosses the gap, so a magnifier user can never read a tooltip longer than
+   their viewport.
+3. **Persistent** — it stays until dismissed, until hover and focus are both
+   gone, or until it stops being valid. No auto-hide timer.
+
+Two more that are not in 1.4.13 and matter as much:
+
+- **Never the `title` attribute.** It cannot be styled, it appears after an
+  uncontrollable delay, screen readers treat it inconsistently, and on touch it
+  does not appear at all.
+- **Never anything interactive inside.** A tooltip is not focusable, so a link
+  or button in one is unreachable by keyboard. If it needs interaction, it is a
+  popover or a dialog.
+
+Use `aria-describedby` when the trigger already has a name and the tooltip adds
+detail; `aria-labelledby` only for an icon-only control with no other name.
+Using both gives the element two competing names. And tooltips do not exist on
+touch — there is no hover, so anything essential must be somewhere else too.
+
 ### Toasts
 
 | Key | Behaviour |
@@ -300,7 +425,7 @@ second per timer.
 ./serve.sh 8080 && open http://localhost:8080/test/run.html
 ```
 
-**113 assertions, run in a real browser.** Deliberately not jsdom: it implements
+**187 assertions, run in a real browser.** Deliberately not jsdom: it implements
 neither sequential focus navigation, nor `inert`, nor `:focus-visible`, nor
 layout — so `getClientRects()` is always empty and every element looks hidden. A
 focus trap that passes in jsdom tells you nothing about whether <kbd>Tab</kbd>
@@ -317,6 +442,12 @@ Two limits worth knowing:
   updates, but `focus`, `focusin` and `focusout` never fire, so any handler that
   reacts to focus movement looks broken. The harness detects this and synthesises
   the events; in a focused window that path is skipped entirely.
+- **A backgrounded tab clamps timers to roughly one per second.** A component
+  timer set for 0 ms and a test's `wait(40)` then both land at ~1000 ms and race
+  each other. For "this should eventually happen", use `until(predicate)`, which
+  asserts the outcome rather than the schedule. For "this should *not* happen" a
+  real wait is still required, long enough to outlast the timer under test —
+  a poll cannot prove a negative.
 
 **No automated tool can hear VoiceOver.** ARIA attributes being correct is
 necessary and not sufficient — the announcement is what the user actually gets,
@@ -397,6 +528,66 @@ cursor · <kbd>VO</kbd> + <kbd>U</kbd> opens the rotor · <kbd>VO</kbd> +
 - [ ] Sort by Files, then reverse. The row with no file count stays at the bottom
       both times.
 
+### Menu button
+
+- [ ] Focus the button. It announces the name **and that a menu will open**
+      ("Actions, menu pop up button") — not just "button".
+- [ ] Press <kbd>↓</kbd>. Focus moves into the menu and the first item is
+      announced with its position ("Rename, 1 of 4").
+- [ ] Press <kbd>d</kbd> repeatedly. It cycles Duplicate → Delete → Duplicate,
+      announcing each.
+- [ ] Arrow past the disabled item. It is **skipped**, not announced as a dead
+      stop you have to arrow off again.
+- [ ] In the View menu, activate a checkbox item. It announces "checked" / "not
+      checked" and the menu **stays open**.
+- [ ] Activate a radio item. Only one in the group is checked, and the group's
+      label ("Sort by") is announced.
+- [ ] <kbd>Esc</kbd>. Focus returns to the button and VoiceOver announces it.
+
+### Listbox
+
+- [ ] Tab into the list. It announces the **label**, "list box", and the number
+      of options.
+- [ ] Arrow through the single-select list. Each option is announced as
+      "selected" as you land on it.
+- [ ] In the multi-select list, arrow down. Options are announced **without**
+      "selected" — the highlight moved, the selection did not.
+- [ ] Press <kbd>Space</kbd>. The option announces as "selected".
+- [ ] <kbd>Shift</kbd> + <kbd>↓</kbd> twice. Each newly selected option is
+      announced.
+- [ ] <kbd>Ctrl</kbd> + <kbd>A</kbd>, then again. The list is selected, then
+      cleared.
+- [ ] Type <kbd>d</kbd>. The highlight jumps to the first option starting with
+      "d" and announces it.
+- [ ] <kbd>VO</kbd> + <kbd>U</kbd> → Form Controls. The list appears once, as a
+      single control — not as eight separate items.
+
+### Slider
+
+- [ ] Focus the Volume thumb. It announces the label, the value, and the range.
+- [ ] Arrow up and down. Each new value is announced as you go.
+- [ ] Focus the Delivery speed thumb. It announces **"Standard"**, not "1". This
+      is the `aria-valuetext` check, and the whole point of the control.
+- [ ] <kbd>Page Up</kbd> and <kbd>Home</kbd>/<kbd>End</kbd> announce the new
+      value each time.
+- [ ] On the price slider, focus each thumb in turn. They announce as
+      **"Minimum price"** and **"Maximum price"**, not both as "Price".
+- [ ] Move the maximum thumb down, then focus the minimum thumb. Its announced
+      **upper bound has moved with it**.
+
+### Tooltip
+
+- [ ] Tab to "Save". The tooltip text is announced **as a description**, after
+      the button's own name — and it appears immediately, with no delay.
+- [ ] Tab to the icon-only button. The tooltip text is announced as its **name**,
+      because it has no other one.
+- [ ] With the pointer resting on a trigger, press <kbd>Esc</kbd>. The tooltip
+      disappears and neither the pointer nor focus has moved.
+- [ ] Hover a trigger, then move the pointer onto the tooltip itself. It stays.
+- [ ] Leave a tooltip open for a minute. It does not time out.
+- [ ] Check that no trigger has a `title` attribute producing a second, native
+      tooltip on top of this one.
+
 ### Toasts
 
 - [ ] Trigger a polite toast while VoiceOver is reading something else. It
@@ -451,6 +642,14 @@ Deliberately not implemented, rather than half-implemented:
   pattern.
 - **Shadow DOM.** `getActiveElement()` pierces open shadow roots, but the focus
   trap's tab cycle does not — `querySelectorAll` does not cross the boundary.
+- **Submenus.** A menu item that opens a nested menu needs its own
+  `aria-haspopup`, <kbd>→</kbd>/<kbd>←</kbd> handling and a hover intent delay,
+  and the focus-return chain has to unwind correctly through every level.
+- **Tree view, date picker and carousel.** Each is a substantial pattern in its
+  own right rather than a variation on something here.
+- **A virtualised listbox.** `aria-activedescendant` must point at an element
+  that exists, so a windowed list needs `aria-setsize`/`aria-posinset` and
+  careful handling of the option currently being pointed at.
 - **A polyfill for `inert`.** There is a documented fallback to `aria-hidden`
   when the property is absent, which covers the accessibility tree but not the
   tab order. Every browser released since mid-2022 supports `inert` natively.
