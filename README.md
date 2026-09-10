@@ -654,4 +654,10 @@ Deliberately not implemented, rather than half-implemented:
   when the property is absent, which covers the accessibility tree but not the
   tab order. Every browser released since mid-2022 supports `inert` natively.
 
+---
+
+## License
+
+MIT. Copy the focus trap.
+
 [apg]: https://www.w3.org/WAI/ARIA/apg/
